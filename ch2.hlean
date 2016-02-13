@@ -5,55 +5,9 @@ Released under the Apache License 2.0 (see "License");
 Theorems and exercises of the HoTT book (ch 2)
 -/
 
-namespace hide
+import .ch1 types.bool
 
-open prod bool sum eq
-
-section ch1
-
-/- ************************************** -/
-/-        Ch.1    Type Theory             -/
-/- ************************************** -/
-
-  variables {A B C D: Type} 
-
-  definition id (A : Type) : A → A := λ (x : A), x
-
-/- §1.5 (Product uniqueness principle)  -/
-
- definition uppt (x : A × B) :
-     x = (pr1  x, pr2 x) :=
- prod.rec_on x (λ a b, refl _)
-
-/- §1.8 (Boolean uniqueness principle)  -/
-
- definition bbuni (x : bool) :
-     sum (x=ff) (x=tt) :=
- bool.rec_on x (inl (refl ff)) (inr (refl tt)) 
-
-/- §1.11 (Proposition-as-types example) -/
-
- definition de_morgan (p : (A → empty) × (B → empty)) : 
-    ( A + B ) → empty :=
- prod.rec_on p (λ x y, 
-  (λ (z : A + B),  sum.rec_on z (λ a, x a) (λ b, y b) ) )
-
-/-- Ch.1 Exercises --/
-
- definition comp (g : B → C) (f : A → B) : A → C := λ (x : A), g (f (x))
-
- notation  g `∘` f  := comp g f
- 
- -- Exercise 1
-
- definition comp_assoc (f : A → B) (g : B → C) (h : C → D) :  h ∘ (g ∘ f) = (h ∘ g) ∘ f :=   
- refl (h ∘ (g ∘ f))
-
-end ch1
-
----
-
-open eq sigma
+open eq prod sum sigma
 
 /- ************************************** -/
 /-    Ch.2 Homotopy Type Theory           -/
@@ -231,7 +185,6 @@ open eq sigma
  --
 
 /- §2.4 (Homotopies and equivalences) -/
-
 
  infix `~` := homotopy
 
@@ -497,11 +450,11 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  notation `⋆` := star
 
- definition eq_star {x y : unit}:
+ definition eq_star {x y : unit} :
      (x = y) → unit   :=
  λ (p : x = y), ⋆
 
- definition unit_eq {x y : unit}:
+ definition unit_eq {x y : unit} :
      unit → (x = y)  :=
  λ u: unit, unit.rec_on x ( unit.rec_on y (refl ⋆))
 
@@ -531,6 +484,8 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
 /- §2.9 (Π-types and the function extensionality axiom) -/
 
+ namespace funext
+
  definition happly {A : Type}  {B : A → Type} {f g: Π (x : A), B x} :
      f = g  →  Π x : A, f x = g x :=
  λ p x, eq.rec_on p (refl (f x))
@@ -544,15 +499,15 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  -- Propositional Computational rules
 
- definition funext_comp {A : Type} {B : A → Type} {f g: Π (x : A), B x} (h : Π x : A, f x = g x) :
+/- definition funext_comp {A : Type} {B : A → Type} {f g: Π (x : A), B x} (h : Π x : A, f x = g x) :
      happly (funext h) = h :=
- by cases @fun_extensionality A B f g with p q; cases p with funext comp; exact comp
+ by cases @fun_extensionality A B f g with p q; cases p with funext comp; exact comp -/
 
  -- Higher Groupoid Structure
 
- definition pi_refl {A : Type}  {B : A → Type} {f : Π (x : A), B x} :  
+/- definition pi_refl {A : Type}  {B : A → Type} {f : Π (x : A), B x} :  
      refl f = funext (happly (refl f) ) :=             
- by apply idp
+ by apply idp -/
 
  -- Transporting non-dependent and dependent functions
 
@@ -579,6 +534,8 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      (Π (a : A x), transport (λ (w : Σ (x : X), A x), B (pr1 w) (pr2 w)) (sigma_eq ⟨p, refl (transport A p a)⟩) (f a) = g (transport A p a)) :=
  by induction p; fapply sigma.mk; exact happly; apply fun_extensionality
 
+ end funext
+
  --
 
 /- §2.10 (Universes and the Univalence axiom) -/
@@ -600,21 +557,19 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  
  -- Propositional and Computational rules
 
- --set_option pp.universes true
-
- definition ua_comp {A B: Type.{i}} (e : A ≃ B):
+/- definition ua_comp {A B: Type.{i}} (e : A ≃ B):
      idtoeqv (ua e) = e :=
   by cases @univalence A B with p q; cases p with ua comp; exact comp
 
  definition ua_eta {A B: Type.{i}} :--(p : A = B) :
      ua ∘ (idtoeqv ) ~ id (A = B) :=
-  by cases univalence with p q; cases q with ua eta; exact eta
+  by cases univalence with p q; cases q with ua eta; exact eta  
 
  -- Higher Groupoid Structure
  
  definition ua_refl {A : Type.{i}} :
      refl A = ua ⟨id A, qinv_to_isequiv _ id_qinv⟩ :=
- refl (refl A)
+ refl (refl A)  -/
 
  -- Lemma 2.10.5
  
@@ -633,6 +588,8 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 /- §2.11 (Identity type) -/
 
  -- Theorem 2.11.1
+
+ open funext
 
  definition id_eq {a a' : A} (f : A → B) (h : isequiv f) :
      isequiv (@ap A B a a' f ) :=
@@ -712,7 +669,9 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  section coproduct
 
- open lift  universe variables i j  parameters {A' : Type.{i}} {B' : Type.{j}} {a₀ : A'}
+ open lift
+
+ universe variables i j  parameters {A' : Type.{i}} {B' : Type.{j}} {a₀ : A'}
 
  definition code : --{A : Type.{i}} {B : Type.{j}} {a₀ : A} :
      A' + B' → Type
@@ -773,7 +732,7 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  open nat
 
- definition natcode : 
+ definition natcode [reducible] : 
      ℕ → ℕ → Type₀
  | natcode 0 0 := unit
  | natcode (succ m) 0 := empty
@@ -788,12 +747,43 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      (m = n) → natcode m n :=
  λ p, transport (natcode m) p (r m)
 
- definition natdecode (m n : ℕ) (c : natcode m n) : 
-     (m = n) :=
- by induction m; induction n; exact (refl 0); exact (empty.rec_on _ c)--; induction n--; exact (empty.rec_on _ c)
+ definition natdecode : Π (m n : ℕ), natcode m n → (m = n)
+ | natdecode 0        0 c  := refl 0
+ | natdecode (succ i) 0 c  := empty.rec_on _ c
+ | natdecode 0  (succ j) c := empty.rec_on _ c
+ | natdecode (succ i) (succ j) c := ap succ (natdecode i j c)
 
+ -- Propositional Computation and Uniqueness rules
 
-/-- Notes   --/
+/- definition nat_uniq (m n : ℕ) (p : m = n) :
+     natdecode m n (natencode m n p) = p :=
+ by induction p; induction m; reflexivity; rewrite [↑natencode,↑natdecode,↑r,v_0]
 
+-- decode (succ i) (succ i) r(i) = refl (succ i)
 
-end hide
+--; apply (ap succ v_0)
+--  definition nat_uniq: Π (m n : ℕ) (p : m = n),
+-- | nat_uniq 0 0 (refl 0)  := idp
+-- | nat_uniq (succ i) (succ i) (refl (succ i))  := ap succ (nat_uniq i i (refl i))
+
+ -- Theorem 2.13.1 (Nat is equivalent to its encoding)
+
+ definition nat_comp : Π (m n : ℕ) (c : natcode m n),
+     natencode m n (natdecode m n c) = c
+ | nat_comp 0        0 c  := @unit_eq (r 0) c c
+ | nat_comp (succ i) 0 c  := empty.rec_on _ c
+ | nat_comp 0  (succ j) c := empty.rec_on _ c
+ | nat_comp (succ i) (succ j) c := calc
+     natencode (succ i) (succ j) (natdecode (succ i) (succ j) c) = transport (natcode (succ i)) (ap succ (natdecode i j c)) (r (succ i)) : idp
+     ... = transport (λ x, natcode (succ i) (succ x)) (natdecode i j c) (r (succ i)) : sorry
+     ... = natencode i j (natdecode i j c) : sorry
+     ... = c : idp
+-/
+
+ -- Theorem 2.13.1
+
+ definition nat_eq (m n : ℕ) : 
+   (m = n) ≃ natcode m n :=
+ sorry
+
+ --
