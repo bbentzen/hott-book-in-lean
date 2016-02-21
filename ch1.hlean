@@ -9,7 +9,7 @@ Theorems and exercises of the HoTT book (Chapter 1)
 /-        Ch.1    Type Theory             -/
 /- ************************************** -/
 
- open sum eq
+ open eq
 
  variables {A B C D: Type} 
 
