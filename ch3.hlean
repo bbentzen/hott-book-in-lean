@@ -147,5 +147,56 @@ definition universe_not_set :
 
  -- Remark 3.2.6 (see ch1.ndne)
 
+  -- Remark 3.2.6 (see ch1.ndne)
+
  -- Corollary 3.2.7
+
+ definition no_lem : --(g : Π A, A ⊎ ¬ A) : 𝟬  :=      
+     (Π A, A + ¬ A) → 𝟬 :=
+ λ g, no_dne (λ (A : Type₀) (x : ¬¬A), sum.rec_on (g (A)) (λ y, y) (λ y, empty.rec_on _ (x y)))
+
+ --
+
+ /- §3.3 (Mere propositions)  -/
+
+ -- Definition 3.3.1
+
+ definition isProp (A : Type) : Type :=
+   Π (x y : A), x = y
+
+ -- Lemma 3.3.2
+
+ definition unit_is_prop : isProp(𝟭) :=
+ λ x y, @unit_eq x y x
+
+ -- Lemma 3.3.3
+
+ definition prop_eqv (H₁ : isProp P) (H₂ : isProp Q) : 
+     (P → Q) → (Q → P) → (P ≃ Q) :=
+ λ f g, have comp_rule : f ∘ g ~ id Q, from λ q, H₂ (f (g q)) q,
+ have uniq_rule : g ∘ f ~ id P, from λ p, H₁ (g (f p)) p,
+ ⟨ f, ( ⟨g, comp_rule⟩, ⟨g, uniq_rule⟩ ) ⟩
+
+ definition prop_eqv_unit (p₀ : P) (H : isProp P) :
+    P ≃ 𝟭 :=
+ let f : P → 𝟭 :=  λ p, ⋆ in let g : 𝟭 → P :=  λ x, p₀ in
+ prop_eqv H unit_is_prop f g
+
+ -- Lemma 3.3.4 Every mere proposition is a set
+
+ definition prop_is_set :
+     isProp(P) → isSet(P) :=
+ λ H x y p q, let g := H x in (((lu p) ⬝ ((left_inv (g x) ⬝ᵣ p)⁻¹ ⬝ (((conc_assoc (g x)⁻¹ (g x) p)⁻¹ ⬝ ((g x)⁻¹ ⬝ₗ -- right cancelation of g(x)
+ ((id_trans_i x p (g x))⁻¹ ⬝ (apd g p)) ⬝ ((apd g q)⁻¹ ⬝ (id_trans_i x q (g x))))) ⬝ -- computation of g(x) ⬝ p = g(x) ⬝ q
+ conc_assoc (g x)⁻¹ (g x) q))) ⬝ (left_inv (g x) ⬝ᵣ q)) ⬝ (lu q)⁻¹ -- left cancelation of g(x)
+
+ -- Lemma 3.3.5 The types isProp and isSet are mere propositions
+
+ definition isProp_is_prop (P : Type) :
+     isProp (isProp(P)) :=
+ λ H₁ H₂, funext (λ x, funext (λ y, (prop_is_set H₁ x y (H₁ x y) (H₂ x y))))
+
+ definition isSet_is_prop (A : Type) :
+     isProp (isSet(A)) :=
+ λ H₁ H₂, funext (λ x, funext (λ y, funext (λ p, funext (λ q, set_is_1_type H₁ x y p q (H₁ x y p q) (H₂ x y p q) ))))
 
