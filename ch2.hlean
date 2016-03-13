@@ -77,22 +77,18 @@ open eq prod sum sigma
 
  definition r_whisker {x y z : A} {p q : x = y} (r : y = z) (α : p = q) :
      p ⬝ r = q ⬝ r :=
- eq.rec_on r α
+ by induction r; apply ((ru p)⁻¹ ⬝ α ⬝ ru q)
 
  definition l_whisker {x y z : A} (q : x = y) {r s : y = z} (β : r = s) :
      q ⬝ r = q ⬝ s :=
- eq.rec_on q (eq.rec_on β (refl (q ⬝ r)))
+ by induction q; apply ((lu r)⁻¹ ⬝ β ⬝ lu s)
 
  notation   α `⬝ᵣ` r  := r_whisker r α
  notation   q `⬝ₗ` β  := l_whisker q β
 
- definition right_cancel {x y z : A} (p : x = y) (r : y = z) :    -- Usefull for proving right unwhisking
-     (p ⬝ r) ⬝ r⁻¹ = p :=
- eq.rec_on r (refl p )
-
  definition unwhisker_right {x y z : A} {p q : x = y} (r : y = z) (h : p ⬝ r = q ⬝ r) :
      p = q :=
- (right_cancel p r)⁻¹ ⬝ (h ⬝ᵣ r⁻¹) ⬝ (right_cancel q r)
+ (eq.rec_on r (refl p ))⁻¹ ⬝ (h ⬝ᵣ r⁻¹) ⬝ (eq.rec_on r (refl q))
 
  -- Theorem 2.1.6 Eckmann-Hilton 
 
