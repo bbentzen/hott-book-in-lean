@@ -57,21 +57,19 @@ open eq prod sum sigma
       p ⬝ p⁻¹ = refl x :=
  eq.rec_on p (refl (refl x) )
 
- -- Lemma 2.1.4 (iii) "Double application of inverses cancel themselves out" :
+ -- Lemma 2.1.4 (iii) "Double application of inverses cancel out" :
 
  definition inv_canc {x y : A} (p : x = y)  : 
      ( p⁻¹ )⁻¹ = p :=
  eq.rec_on p (refl (refl x))
  
-  -- Lemma 2.1.4 (iii) "composition is associative" :
+ -- Lemma 2.1.4 (iii) "composition is associative" :
 
  definition conc_assoc {x y z w: A} (p : x = y) (q : y = z) (r : z = w)  :
      p ⬝ (q ⬝ r)  = (p ⬝ q) ⬝ r :=
  eq.rec_on r (eq.rec_on q  (refl ( p ⬝ refl y ⬝ refl y )) )
 
- definition conc_assoc' {x y z w: A} (p : x = y) (q : y = z) (r : z = w)  :  -- this only works with my path_conc
-     p ⬝ (q ⬝ r)  = (p ⬝ q) ⬝ r :=
- eq.rec_on p (eq.rec_on q (eq.rec_on r (refl ((p ⬝ q) ⬝ refl z) )) )
+ -- Theorem 2.1.6 Eckmann-Hilton 
 
  -- Whiskering
 
@@ -90,11 +88,27 @@ open eq prod sum sigma
      p = q :=
  (eq.rec_on r (refl p ))⁻¹ ⬝ (h ⬝ᵣ r⁻¹) ⬝ (eq.rec_on r (refl q))
 
- -- Theorem 2.1.6 Eckmann-Hilton 
+ definition unwhisker_left {x y z : A} {r s : y = z} (q : x = y) (h : q ⬝ r = q ⬝ s) :
+     r = s :=
+ (conc_assoc q⁻¹ q r ⬝ (left_inv q ⬝ᵣ r) ⬝ (lu r)⁻¹)⁻¹ ⬝
+ (q⁻¹ ⬝ₗ h) ⬝ (conc_assoc q⁻¹ q s ⬝ (left_inv q ⬝ᵣ s) ⬝ (lu s)⁻¹)
+
+ definition whisker_comm (a b c: A) (p q : a = b) (r s : b = c) (α : p = q) (β : r = s):
+     (α ⬝ᵣ r) ⬝ (q ⬝ₗ β) = (p ⬝ₗ β) ⬝ (α ⬝ᵣ s) :=
+ by induction α; induction β; induction p; induction r; apply idp
+
+ -- Eckmann-Hilton
 
  definition eckmann_hilton (a : A) (α β : refl a = refl a) :
      α ⬝ β = β ⬝ α  :=
- sorry
+ calc
+   α ⬝ β = (α ⬝ᵣ refl a) ⬝ (refl a ⬝ₗ β) : begin rewrite (α ⬝ₗ (lu β)), exact (lu _ ⬝ conc_assoc _ _ _) end
+   ...  = (refl a ⬝ₗ β) ⬝ (α ⬝ᵣ refl a) : whisker_comm
+   ...  = β ⬝ α : begin rewrite (β ⬝ₗ (lu α)), exact (lu _ ⬝ conc_assoc _ _ _)⁻¹ end
+
+ -- Definition 2.1.7 Pointed types
+
+ definition pointed : Type := Σ (A : Type), A
 
  --
 
