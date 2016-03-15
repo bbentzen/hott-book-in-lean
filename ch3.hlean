@@ -15,7 +15,7 @@ open eq prod unit bool sum sigma ua funext nat lift
 
 /- §3.1 (Sets and n-types)  -/
 
- variables {A B C Z: Type} 
+ variables {A B P Q Z: Type} 
 
  -- Definition 3.1.1 :
 
