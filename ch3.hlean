@@ -57,11 +57,6 @@ open prod bool sum unit eq ua nat
      H₂ (pr2 x) (pr2 y) (ap pr2 p) (ap pr2 q)),
  (prod_uniq p)⁻¹ ⬝ (ap pair_eq H) ⬝ prod_uniq q
 
-open funext
-
- definition funext_uniq {A : Type} {B : A → Type} {f g: Π (x : A), B x} (p : f = g) :
-     funext (happly p) = p := sorry
-
  -- Pi type
 
  example (B : A → Type) (H : Π (x : A), isSet (B x)) :
@@ -71,13 +66,13 @@ open funext
  
  -- Homotopy n-types
 
- definition is1type (A : Type) : Type :=
+  definition is_1_Type (A : Type) : Type :=
    Π (x y : A) (p q : x = y) (r s : p = q), r = s
 
  -- Lemma 3.1.8 (Every set is a 1-type)
 
- definition setis1type (A : Type) :
-     isSet A → is1type A :=
+ definition set_is_1_type :
+     isSet A → is_1_Type A :=
  λ f x y p q r s, let g := f x y p in
  (((lu r) ⬝ ((left_inv (g p) ⬝ᵣ r)⁻¹ ⬝ (((conc_assoc (g p)⁻¹ (g p) r)⁻¹ ⬝ ((g p)⁻¹ ⬝ₗ -- right cancelation of g(p)
  ((id_trans_i p r (g p))⁻¹ ⬝ (apd g r)) ⬝ ((apd g s)⁻¹ ⬝ (id_trans_i p s (g p))))) ⬝ -- computation of g(p) ⬝ r = g(p) ⬝ s
@@ -85,7 +80,7 @@ open funext
 
  -- Example 3.1.8 (The universe is not a type)
 
- definition bnegeq :
+ definition bneg_eq :
      𝟮 ≃ 𝟮 :=
  sigma.mk bneg (qinv_to_isequiv bneg (sigma.mk bneg (λ x, bool.rec_on x idp idp,λ x, bool.rec_on x idp idp) ))
 
@@ -114,26 +109,26 @@ definition universe_not_set :
  -- Some useful lemmas
 
  definition trans_f2u (f : Π (A : Type₀), ¬¬A → A) :
-     Π (u : ¬¬𝟮), (transport (λ A, A) (ua bnegeq) (f 𝟮 (transport (λ A : Type₀, ¬¬A) (ua bnegeq)⁻¹ u)) = (f 𝟮) u) :=
- λ u : ¬¬𝟮, happly ((nondep_trans_pi (ua bnegeq) (f 𝟮))⁻¹ ⬝ (apd f (ua bnegeq))) u
+     Π (u : ¬¬𝟮), (transport (λ A, A) (ua bneg_eq) (f 𝟮 (transport (λ A : Type₀, ¬¬A) (ua bneg_eq)⁻¹ u)) = (f 𝟮) u) :=
+ λ u : ¬¬𝟮, happly ((nondep_trans_pi (ua bneg_eq) (f 𝟮))⁻¹ ⬝ (apd f (ua bneg_eq))) u
 
  definition trans_dne_lemma (u : ¬¬𝟮) : -- used in ap_ua_lemma
-    transport (λ (A : Type₀), ¬¬A) (ua bnegeq)⁻¹ u = u :=
- funext (λ x , empty.rec_on _ (u x) (transport (λ (A : Type₀), ¬¬A ) (ua bnegeq)⁻¹ u) u)
+    transport (λ (A : Type₀), ¬¬A) (ua bneg_eq)⁻¹ u = u :=
+ funext (λ x , empty.rec_on _ (u x) (transport (λ (A : Type₀), ¬¬A ) (ua bneg_eq)⁻¹ u) u)
 
  definition trans_ua_lemma (f : Π (A : Type₀), ¬¬A → A) (u : ¬¬𝟮) :  -- used in ap_ua_lemma
-    transport (λ (A : Type₀), A) (ua bnegeq) (f 𝟮 u) = bneg ((f 𝟮) u) :=
- by rewrite [trans_univ (ua bnegeq) (f 𝟮 u) ⬝ trans_idtoequiv (ua bnegeq) (f 𝟮 u)]; apply (calc
-   bneg (f 𝟮 u) = sigma.pr1 bnegeq (f 𝟮 u)  : idp
-   ...          = sigma.pr1 (idtoeqv (ua bnegeq)) (f 𝟮 u) :  happly (ap sigma.pr1 (ua_comp bnegeq)⁻¹) (f 𝟮 u)
-   ...          = sigma.pr1 (idtoeqv (ap (λ (a : Type₀), a) (ua bnegeq))) (f 𝟮 u) :
-                    (happly (ap sigma.pr1 (ap idtoeqv (@ap_func_iv Type₀ 𝟮 𝟮 𝟮 (ua bnegeq)))) (f 𝟮 u))⁻¹  )⁻¹
+    transport (λ (A : Type₀), A) (ua bneg_eq) (f 𝟮 u) = bneg ((f 𝟮) u) :=
+ by rewrite [trans_univ (ua bneg_eq) (f 𝟮 u) ⬝ trans_idtoequiv (ua bneg_eq) (f 𝟮 u)]; apply (calc
+   bneg (f 𝟮 u) = sigma.pr1 bneg_eq (f 𝟮 u)  : idp
+   ...          = sigma.pr1 (idtoeqv (ua bneg_eq)) (f 𝟮 u) :  happly (ap sigma.pr1 (ua_comp bneg_eq)⁻¹) (f 𝟮 u)
+   ...          = sigma.pr1 (idtoeqv (ap (λ (a : Type₀), a) (ua bneg_eq))) (f 𝟮 u) :
+                    (happly (ap sigma.pr1 (ap idtoeqv (@ap_func_iv Type₀ 𝟮 𝟮 𝟮 (ua bneg_eq)))) (f 𝟮 u))⁻¹  )⁻¹
 
  definition ap_ua_lemma (f : Π (A : Type₀), ¬¬A → A) (u : ¬¬𝟮) :
      (f 𝟮) u = bneg ((f 𝟮) u) :=
  calc
-  (f 𝟮) u = transport (λ (A : Type₀), A) (ua bnegeq) (f 𝟮 (transport (λ A : Type₀, ¬¬A) (ua bnegeq)⁻¹ u)) : trans_f2u
-  ...     = transport (λ (A : Type₀), A) (ua bnegeq) (f 𝟮 u) : trans_dne_lemma
+  (f 𝟮) u = transport (λ (A : Type₀), A) (ua bneg_eq) (f 𝟮 (transport (λ A : Type₀, ¬¬A) (ua bneg_eq)⁻¹ u)) : trans_f2u
+  ...     = transport (λ (A : Type₀), A) (ua bneg_eq) (f 𝟮 u) : trans_dne_lemma
   ...     = bneg ((f 𝟮) u) : trans_ua_lemma
 
  definition prop_324 :
@@ -142,12 +137,11 @@ definition universe_not_set :
 
  -- Theorem 3.2.2
 
- definition no_dne (f : Π A, ¬¬A  → A) : 𝟬 :=
- (λ (u : ¬¬𝟮), (prop_324 ((f 𝟮) u)) (ap_ua_lemma f u)⁻¹) (λ (nu : ¬𝟮), nu tt)
+ definition no_dne :
+     (Π A, ¬¬A → A) → 𝟬 :=
+ λ f, (λ (u : ¬¬𝟮), (prop_324 ((f 𝟮) u)) (ap_ua_lemma f u)⁻¹) (λ (nu : ¬𝟮), nu tt)
 
  -- Remark 3.2.6 (see ch1.ndne)
-
-  -- Remark 3.2.6 (see ch1.ndne)
 
  -- Corollary 3.2.7
 
@@ -190,7 +184,7 @@ definition universe_not_set :
  ((id_trans_i x p (g x))⁻¹ ⬝ (apd g p)) ⬝ ((apd g q)⁻¹ ⬝ (id_trans_i x q (g x))))) ⬝ -- computation of g(x) ⬝ p = g(x) ⬝ q
  conc_assoc (g x)⁻¹ (g x) q))) ⬝ (left_inv (g x) ⬝ᵣ q)) ⬝ (lu q)⁻¹ -- left cancelation of g(x)
 
- -- Lemma 3.3.5 The types isProp and isSet are mere propositions
+  -- Lemma 3.3.5 The types isProp and isSet are mere propositions
 
  definition isProp_is_prop (P : Type) :
      isProp (isProp(P)) :=
@@ -200,3 +194,107 @@ definition universe_not_set :
      isProp (isSet(A)) :=
  λ H₁ H₂, funext (λ x, funext (λ y, funext (λ p, funext (λ q, set_is_1_type H₁ x y p q (H₁ x y p q) (H₂ x y p q) ))))
 
+ --
+
+ /- §3.4 (Classical vs. intuitionistic logic)  -/
+
+ definition lem : Type :=
+    Π (A : Type), (isProp(A) → (A + ¬ A))
+ 
+ definition dne : Type :=
+    Π (A : Type), (isProp(A) → (¬¬ A → A))
+
+ -- Definition 3.4.3
+
+ namespace decidable
+
+ definition decidable (A : Type) : Type := A + ¬ A
+    
+ definition decidable_family (B : A → Type) : Type := Π (a : A), B (a) + ¬ B (a)
+
+ definition decidable_eq (A : Type) : Type := Π (a b : A), (a = b) + ¬ (a = b)
+
+ end decidable
+
+ --
+
+ /- §3.5 (Subsets and propositional resizing)  -/
+
+ -- Lemma 3.5.1
+
+ definition prop_sigma_eq (P : A → Type) (H : Π (x : A), isProp(P(x))) (u v : Σ (x : A), P x) :
+     (pr1 u = pr1 v) → u = v :=
+ λ p, sigma_eq ⟨p, begin cases u with u1 u2, cases v with v1 v2, esimp at *, induction p, apply ((H u1) u2 v2) end ⟩
+ 
+ -- Definitions of subset and subtype
+
+ definition subset (P : A → Type) {H : Π (x : A), isProp(P(x))} : Type :=
+     Σ (x : A), P x
+
+ notation `{` binder `|` x :(scoped P, subset P) `}`  := x
+
+ --
+
+ /- §3.6 (The logic of mere propositions)  -/
+
+ -- Example 3.6.1
+
+ definition prod_preserves_prop (H₁ : isProp A) (H₂ : isProp B) :
+     isProp (A × B) :=
+ λ x y, prod.rec_on x (λ a b, prod.rec_on y (λ a' b', pair_eq (H₁ a a', H₂ b b')))
+
+ definition sigma_preserves_prop (H₁ : isProp A) (B : A → Type) (H₂ : Π (x : A), isProp (B x)) :
+     isProp (Σ (x : A), B x) :=
+ λ w w', sigma.rec_on w (λ w1 w2, sigma.rec_on w' (λ w1' w2', sigma_eq ⟨H₁ w1 w1', H₂ w1' (transport B (H₁ w1 w1') w2) w2' ⟩  ))
+
+ -- Example 3.6.2
+
+ definition pi_preserves_prop (H₁ : isProp A) (B : A → Type) (H₂ : Π (x : A), isProp (B x)) :
+     isProp (Π (x : A), B x) :=
+ λ f g, funext (λ x, H₂ x (f x) (g x))
+
+ definition func_preserves_prop (H₁ : isProp A) (H₂ : isProp B) :
+     isProp (A → B) :=
+ λ f g, funext (λ x, H₂ (f x) (g x))
+
+ definition neg_preserves_prop (H : isProp A) :
+     isProp (¬A) :=
+ func_preserves_prop H (λ x y, empty.rec_on _ x)
+
+ -- A + B does not preserve propositions
+
+ definition sum_doesnt_pres_prop :
+     (Π (A : Type₀) (B : Type₀) (H₁ : isProp A) (H₂ : isProp B), isProp (A + B)) →  𝟬 :=
+ λ f, let H := f 𝟭 𝟭 (λ u v, @unit_eq u v u) (λ u v, @unit_eq u v u) in
+ down (encode (inr ⋆) (H (inl ⋆) (inr ⋆)))
+
+ --
+
+ /- §3.7 (Propositional truncation)  -/
+
+ namespace trunc
+
+ inductive trunc (A : Type) : Type :=
+ | mk : A → trunc A
+
+ constant get_prop {A : Type} : trunc A → isProp (trunc A) 
+ 
+ notation `║` A `║`  := trunc A
+
+ definition lor (P Q : Type) : Type :=
+   ║P + Q║
+
+ definition lexists (A : Type) (P : A → Type) : Type :=
+   ║(Σ (x : A), P x)║
+
+ notation P `∨` Q  := lor P Q
+
+ notation `∃` binder `,` x :(scoped P, lexists _ P) := x
+
+ end trunc
+
+ --
+
+ /- §3.8 (The axiom of choice)  -/ 
+
+ 
