@@ -24,19 +24,17 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- Example 3.1.2
 
- definition unitalleq (x y : unit) : x = y := unit.rec_on x (unit.rec_on y (refl ⋆))
-
- definition unitset : isSet(unit) :=
-     λ (x y : unit) (p q : x = y), ((transport _ (ua (@unit_equiv x y))⁻¹ (λ x y, unitalleq x y)) p q)
+ definition unit_is_set : isSet(𝟭) :=
+ λ (x y : 𝟭) (p q : x = y), ((transport _ (ua (@unit_equiv x y))⁻¹ (λ x y, @unit_eq x y x)) p q)
 
  -- Example 3.1.3
 
- example : isSet(empty) :=
- λ (x y : empty) (p q : x=y), (empty.rec_on _ x)
+ definition empty_is_set : isSet(𝟬) :=
+ λ (x y : 𝟬) (p q : x=y), (empty.rec_on _ x)
 
  -- Example 3.1.4
 
- definition emptyalleq (x y : empty) : x = y := empty.rec_on _ x
+ definition emptyalleq (x y : 𝟬) : x = y := empty.rec_on _ x
 
 /- example : isSet(ℕ) :=
  by intro m n p q; induction m; induction n; exact (transport _ (ua (nat_eq 0 0))⁻¹ (λ x y, unitalleq x y) p q);
@@ -49,7 +47,7 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- Product type
 
- example (H₁ : isSet A) (H₂ : isSet B) :
+ definition prod_preserves_sets (H₁ : isSet A) (H₂ : isSet B) :
      isSet (A × B) :=
  λ (x y : A × B) (p q : x = y), 
    have H : (ap pr1 p, ap pr2 p) = (ap pr1 q, ap pr2 q), from
@@ -59,7 +57,7 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- Pi type
 
- example (B : A → Type) (H : Π (x : A), isSet (B x)) :
+ definition pi_preserves_sets (B : A → Type) (H : Π (x : A), isSet (B x)) :
      isSet (Π (x : A), B x) := 
  λ f g p q, have eq : happly p = happly q, from funext (λ x, H x (f x) (g x) ((happly p) x) ((happly q) x)),
  (funext_uniq p)⁻¹ ⬝ (ap funext eq) ⬝ funext_uniq q
