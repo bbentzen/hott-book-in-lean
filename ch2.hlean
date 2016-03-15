@@ -817,12 +817,17 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  
   /- §2.15 (Universal Properties) -/
 
- definition umpprod :
-     (X → A × B) → (X → A) × (X → B) :=
+ definition umpprod {X : Type} :
+     (X → A × B) → ((X → A) × (X → B)) :=
  λ u, (λ x, pr1 (u x) , λ x, pr2 (u x) )
 
  -- Theorem 2.15.2
 
- definition prodinv :
- (X → A) × (X → B) → (X → A × B) := λ fg, λ x, ((pr1 fg) x, (pr2 fg) x)
+ definition umpprod_eq {X : Type} :
+     (X → A × B) ≃ (X → A) × (X → B) :=
+ let prodinv := λ fg, λ x, ((pr1 fg) x, (pr2 fg) x) in
+ have comp_rule : umpprod ∘ prodinv  ~ id _, from begin intro x, cases x with f g, reflexivity end,
+ have uniq_rule : Π h, prodinv (@umpprod A B X h) = h, from begin intro h, unfold umpprod,
+   apply funext, intro x, cases (h x) with a b, esimp end,
+ ⟨umpprod, (⟨prodinv, comp_rule⟩, ⟨prodinv, uniq_rule⟩)⟩ 
 
