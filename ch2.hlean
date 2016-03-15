@@ -797,3 +797,32 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  sorry
 
  --
+ 
+ /- §2.14 (Example: equality of structures) -/
+
+ open ua
+
+ definition semigroupStr (A : Type) : Type :=
+ Σ (m : A → A → A), Π (x y z : A), m x (m y z) = m (m x y) z
+
+ definition semigroup : Type :=
+ Σ (A : Type), semigroupStr A
+
+ -- §2.14.1 Lifting Equivalences
+
+ universe variables i j
+
+ example {A B : Type.{i}} (e : A ≃ B) (g : semigroupStr A) : semigroupStr B :=
+ transport semigroupStr (ua e) g
+ 
+  /- §2.15 (Universal Properties) -/
+
+ definition umpprod :
+     (X → A × B) → (X → A) × (X → B) :=
+ λ u, (λ x, pr1 (u x) , λ x, pr2 (u x) )
+
+ -- Theorem 2.15.2
+
+ definition prodinv :
+ (X → A) × (X → B) → (X → A × B) := λ fg, λ x, ((pr1 fg) x, (pr2 fg) x)
+
