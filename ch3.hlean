@@ -5,9 +5,9 @@ Released under the Apache License 2.0 (see "License");
 Theorems and exercises of the HoTT book (Chapter 3)
 -/
 
-import .ch2
+import .ch2 types.bool
 
-open prod bool sum unit eq ua nat
+open eq prod unit bool sum sigma ua funext nat lift
 
 /- ************************************** -/
 /-    Ch.3 Sets and Logic                 -/
