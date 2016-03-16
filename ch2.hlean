@@ -817,17 +817,57 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  
   /- §2.15 (Universal Properties) -/
 
- definition umpprod {X : Type} :
+ definition upprod {X : Type} :
      (X → A × B) → ((X → A) × (X → B)) :=
  λ u, (λ x, pr1 (u x) , λ x, pr2 (u x) )
 
  -- Theorem 2.15.2
 
- definition umpprod_eq {X : Type} :
+ definition upprod_eq {X : Type} :
      (X → A × B) ≃ (X → A) × (X → B) :=
  let prodinv := λ fg, λ x, ((pr1 fg) x, (pr2 fg) x) in
- have comp_rule : umpprod ∘ prodinv  ~ id _, from begin intro x, cases x with f g, reflexivity end,
- have uniq_rule : Π h, prodinv (@umpprod A B X h) = h, from begin intro h, unfold umpprod,
+ have comp_rule : upprod ∘ prodinv  ~ id _, from begin intro x, cases x with f g, reflexivity end,
+ have uniq_rule : Π h, prodinv (upprod h) = h, from begin intro h, unfold upprod,
    apply funext, intro x, cases (h x) with a b, esimp end,
- ⟨umpprod, (⟨prodinv, comp_rule⟩, ⟨prodinv, uniq_rule⟩)⟩ 
+ ⟨upprod, (⟨prodinv, comp_rule⟩, ⟨prodinv, uniq_rule⟩)⟩
 
+ -- Theorem 2.15.5
+
+ definition dupprod {X : Type} {A B : X → Type} :
+     (Π (x : X), A x × B x) → ((Π (x : X), A x) × (Π (x : X), B x)) :=
+ λ u, (λ x, pr1 (u x) , λ x, pr2 (u x) )
+ 
+ definition dprodinv {X : Type} {A B : X → Type} :
+     ((Π (x : X), A x) × (Π (x : X), B x)) → (Π (x : X), A x × B x) :=
+ λ fg, λ x, ((pr1 fg) x, (pr2 fg) x)
+
+ definition dumpprod_eq {X : Type} {A B : X → Type} :
+     (Π (x : X), A x × B x) ≃ ((Π (x : X), A x) × (Π (x : X), B x)) :=
+ have comp_rule : dupprod ∘ dprodinv  ~ id _, from begin intro x, cases x with f g, reflexivity end,
+ have uniq_rule : Π h, dprodinv (dupprod h) = h, from begin intro h, unfold [dupprod,dprodinv],
+   apply funext, intro x, cases (h x) with a b, esimp end,
+ ⟨dupprod, (⟨dprodinv, comp_rule⟩, ⟨dprodinv, uniq_rule⟩)⟩
+
+ -- Theorem 2.15.7 
+ 
+ definition upsigma {X : Type} {P : A → Type} :
+     (X → (Σ (x : A), P x)) → (Σ (g : X → A), (Π (x : X), P (g x))) :=
+ λ f, ⟨ λ x, pr1 (f x), λ x, sigma.rec_on (f x) (λ w1 w2, w2) ⟩
+
+ definition invupsig {X : Type} {P : A → Type} :
+     (Σ (g : X → A), (Π (x : X), P (g x))) → (X → (Σ (x : A), P x))  :=
+ begin
+   intro w x, cases w with w1 w2, apply ⟨ w1 x, w2 x⟩
+ end
+
+ definition upsig_comp {X : Type} {P : A → Type} (w : Σ (g : X → A), (Π (x : X), P (g x))) :
+     upsigma (invupsig w) = w :=
+ begin
+  cases w with w1 w2, apply idp
+ end
+
+ definition upsig_uniq {X : Type} {P : A → Type} (f : (X → (Σ (x : A), P x))) :
+     invupsig (upsigma f) = f :=
+ begin
+  apply funext, intro x, unfold [invupsig,upsigma], cases (f x) with w1 w2, esimp at *
+ end
