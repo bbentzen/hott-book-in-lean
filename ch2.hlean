@@ -815,7 +815,9 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  example {A B : Type.{i}} (e : A ≃ B) (g : semigroupStr A) : semigroupStr B :=
  transport semigroupStr (ua e) g
  
-  /- §2.15 (Universal Properties) -/
+ /- §2.15 (Universal Properties) -/
+
+ -- Product type satisfies the expected universal property
 
  definition upprod {X : Type} :
      (X → A × B) → ((X → A) × (X → B)) :=
@@ -831,43 +833,72 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
    apply funext, intro x, cases (h x) with a b, esimp end,
  ⟨upprod, (⟨prodinv, comp_rule⟩, ⟨prodinv, uniq_rule⟩)⟩
 
- -- Theorem 2.15.5
+ -- Theorem 2.15.5 (Dependent version of the UP)
 
  definition dupprod {X : Type} {A B : X → Type} :
      (Π (x : X), A x × B x) → ((Π (x : X), A x) × (Π (x : X), B x)) :=
  λ u, (λ x, pr1 (u x) , λ x, pr2 (u x) )
- 
- definition dprodinv {X : Type} {A B : X → Type} :
-     ((Π (x : X), A x) × (Π (x : X), B x)) → (Π (x : X), A x × B x) :=
- λ fg, λ x, ((pr1 fg) x, (pr2 fg) x)
 
- definition dumpprod_eq {X : Type} {A B : X → Type} :
+ definition dupprod_eq {X : Type} {A B : X → Type} :
      (Π (x : X), A x × B x) ≃ ((Π (x : X), A x) × (Π (x : X), B x)) :=
+ let dprodinv := λ fg, λ x, ((pr1 fg) x, (pr2 fg) x) in
  have comp_rule : dupprod ∘ dprodinv  ~ id _, from begin intro x, cases x with f g, reflexivity end,
- have uniq_rule : Π h, dprodinv (dupprod h) = h, from begin intro h, unfold [dupprod,dprodinv],
+ have uniq_rule : Π h, dprodinv (dupprod h) = h, from begin intro h, unfold dupprod,
    apply funext, intro x, cases (h x) with a b, esimp end,
  ⟨dupprod, (⟨dprodinv, comp_rule⟩, ⟨dprodinv, uniq_rule⟩)⟩
 
- -- Theorem 2.15.7 
- 
- definition upsigma {X : Type} {P : A → Type} :
-     (X → (Σ (x : A), P x)) → (Σ (g : X → A), (Π (x : X), P (g x))) :=
+ -- Theorem 2.15.7 (Sigma type satisfies the expected universal property )
+
+ -- Non-dependent case
+
+ definition upsig {X : Type} {P : A → Type} :
+     (X → (Σ (a : A), P a)) → (Σ (g : X → A), (Π (x : X), P (g x))) :=
  λ f, ⟨ λ x, pr1 (f x), λ x, sigma.rec_on (f x) (λ w1 w2, w2) ⟩
 
- definition invupsig {X : Type} {P : A → Type} :
-     (Σ (g : X → A), (Π (x : X), P (g x))) → (X → (Σ (x : A), P x))  :=
- begin
-   intro w x, cases w with w1 w2, apply ⟨ w1 x, w2 x⟩
- end
+ definition upsig_eq {X : Type} {P : A → Type} :
+     (X → (Σ (a : A), P a)) ≃ (Σ (g : X → A), (Π (x : X), P (g x))) :=
+ let invupsig := λ w x, sigma.rec_on w (λ w1 w2, ⟨ w1 x, w2 x⟩) in
+ have comp_rule : Π w, upsig (invupsig w) = w, from begin intro w, cases w with w1 w2, apply idp end,
+ have uniq_rule : Π f, invupsig (upsig f) = f, from begin intro f, apply funext, intro x,
+  unfold upsig, cases (f x) with w1 w2, esimp end,
+ ⟨upsig, (⟨invupsig, comp_rule⟩, ⟨invupsig, uniq_rule⟩)⟩
 
- definition upsig_comp {X : Type} {P : A → Type} (w : Σ (g : X → A), (Π (x : X), P (g x))) :
-     upsigma (invupsig w) = w :=
- begin
-  cases w with w1 w2, apply idp
- end
+ -- Dependent case (with basically the same proof)
 
- definition upsig_uniq {X : Type} {P : A → Type} (f : (X → (Σ (x : A), P x))) :
-     invupsig (upsigma f) = f :=
- begin
-  apply funext, intro x, unfold [invupsig,upsigma], cases (f x) with w1 w2, esimp at *
- end
+ definition dupsig {X : Type} {A : X → Type} {P : Π (x : X), A x → Type} :
+     (Π (x : X), (Σ (a : A x), P x a)) → (Σ (g : Π (x : X), A x), (Π (x : X), P x (g x))) :=
+ λ f, ⟨ λ x, pr1 (f x), λ x, sigma.rec_on (f x) (λ w1 w2, w2) ⟩
+
+ definition dupsig_eq {X : Type} {A : X → Type} {P : Π (x : X), A x → Type} :
+     (Π (x : X), (Σ (a : A x), P x a)) ≃ (Σ (g : Π (x : X), A x), (Π (x : X), P x (g x))) :=
+ let qinv := λ w x, sigma.rec_on w (λ w1 w2, ⟨ w1 x, w2 x⟩) in
+ have α : Π w, dupsig (qinv w) = w, from begin intro w, cases w with w1 w2, apply idp end,
+ have β : Π f, qinv (dupsig f) = f, from begin intro f, apply funext, intro x,
+  unfold dupsig, cases (f x) with w1 w2, esimp end,
+ ⟨dupsig, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
+
+ -- Product type and the "mapping out" universal property
+
+ definition ccadj :
+     (A × B → C) → (A → (B → C)) :=
+ λ f a b, f (a,b)
+
+ definition ccadj_eq :
+     (A × B → C) ≃ (A → (B → C)) :=
+ let qinv := λ g p, (g (pr1 p)) (pr2 p) in
+ have α : ccadj ∘ qinv ~ id (A → (B → C)), from λ g, idp,
+ have β : Π (f : A × B → C), qinv (ccadj f)= f, from begin intro f, apply funext, intro x, apply (ap f (uppt x)⁻¹) end,
+ ⟨ccadj, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
+
+ -- Dependent version
+
+ definition dccadj {C : A × B → Type} :
+     (Π (w : A × B), C w) → (Π (a : A) (b : B), C (a,b)) :=
+ λ f a b, f (a,b)
+
+ definition dccadj_eq {C : A × B → Type} :
+     (Π (w : A × B), C w) ≃ (Π (a : A) (b : B), C (a,b)) :=
+ let qinv := λ g w, prod.rec_on w (λ a b, g a b ) in
+ have α : dccadj ∘ qinv ~ id _, from λ g, idp,
+ have β : Π f, qinv (dccadj f)= f, from begin intro f, apply funext, intro x, cases x with a b, reflexivity end,
+ ⟨dccadj, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
