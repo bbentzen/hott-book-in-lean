@@ -507,11 +507,11 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      (Π x : A, f x = g x) → f = g :=
  by cases fun_extensionality with p q; cases p with funext comp; exact funext
 
- -- Propositional Computational rules
+ -- Propositional Computational and Uniqueness rules
 
  definition funext_comp {A : Type} {B : A → Type} {f g: Π (x : A), B x} (h : Π x : A, f x = g x) :
      happly (funext h) = h :=
- by unfold [happly,funext]; cases @fun_extensionality A B f g with p q; cases p with funxt comprule; exact (comprule h)
+ by unfold [happly,funext]; cases @fun_extensionality A B f g with p q; cases p with funxet' comprule; exact (comprule h)
 
  definition funext_uniq {A : Type} {B : A → Type} {f g: Π (x : A), B x} (p : f = g) :
      funext (happly p) = p :=
@@ -526,8 +526,16 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  -- Higher Groupoid Structure
 
  definition pi_refl {A : Type}  {B : A → Type} {f : Π (x : A), B x} :  
-     refl f = funext (happly (refl f) ) :=             
+     refl f = funext (λ x, (refl (f x))) :=             
  (funext_uniq (refl f))⁻¹
+
+ definition pi_inv {A : Type}  {B : A → Type} {f g : Π (x : A), B x} (p : f = g) :  
+     p⁻¹ = (funext (λ x, (happly p x)⁻¹)) :=             
+ by induction p; apply (funext_uniq (refl f))⁻¹
+ 
+ definition pi_comp {A : Type}  {B : A → Type} {f g h: Π (x : A), B x} (p : f = g) (q : g = h) :  
+     p ⬝ q = (funext (λ x, (happly p x) ⬝ (happly q x))) :=
+ by induction p; induction q; apply (funext_uniq idp)⁻¹
 
  -- Transporting non-dependent and dependent functions
 
@@ -577,19 +585,40 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  
  -- Propositional and Computational rules
 
-/- definition ua_comp {A B: Type.{i}} (e : A ≃ B):
+ definition ua_comp {A B: Type.{i}} (e : A ≃ B):
      idtoeqv (ua e) = e :=
-  by cases @univalence A B with p q; cases p with ua comp; exact comp
+ by unfold [idtoeqv,ua]; cases @univalence A B with p q; cases p with ua' comprule; exact (comprule e)
 
- definition ua_eta {A B: Type.{i}} :--(p : A = B) :
-     ua ∘ (idtoeqv ) ~ id (A = B) :=
-  by cases univalence with p q; cases q with ua eta; exact eta  
+ definition ua_uniq {A B: Type.{i}} (p : A = B):
+     ua (idtoeqv p) = p :=
+ begin
+   cases @univalence A B with α β, cases β with ua' uniqrule,
+   apply ((show ua (idtoeqv p) = ua' (idtoeqv p), from calc
+     ua (idtoeqv p) = ua' (idtoeqv (ua (idtoeqv p))) : uniqrule (ua (idtoeqv p))
+     ... = ua' (idtoeqv p) : ua_comp)
+   ⬝ uniqrule p)
+ end
 
  -- Higher Groupoid Structure
  
- definition ua_refl {A : Type.{i}} :
-     refl A = ua ⟨id A, qinv_to_isequiv _ id_qinv⟩ :=
- refl (refl A)  -/
+ definition ua_refl :
+     refl A = ua (typeq_refl A) :=
+ (ua_uniq _)⁻¹ ⬝ ((ua_uniq _)⁻¹ ⬝ (ap ua ((ua_comp (typeq_refl A)) ⬝ idp)))⁻¹ 
+
+ definition ua_inv {A B: Type.{i}} (f : A ≃ B) :
+     (ua f)⁻¹ = ua (f⁻¹) :=
+ calc
+  (ua f)⁻¹ = ua (idtoeqv (ua f)⁻¹) : ua_uniq
+  ... = ua (idtoeqv (ua f))⁻¹ : eq.rec_on (ua f) idp
+  ... = ua (f⁻¹) : ua_comp f 
+
+ definition ua_com {A B C: Type.{i}} (f : A ≃ B) (g : B ≃ C) :
+     ua f ⬝ ua g = ua (f ∘ g) :=
+ calc
+  ua f ⬝ ua g = ua (idtoeqv ((ua f) ⬝ (ua g))) : ua_uniq
+  ... = ua ((idtoeqv (ua f)) ∘ (idtoeqv (ua g))) : begin induction (ua f), induction (ua g), esimp end
+  ... = ua ((idtoeqv (ua f)) ∘ g ) : ua_comp
+  ... = ua (f ∘ g) : ua_comp
 
  -- Lemma 2.10.5
  
