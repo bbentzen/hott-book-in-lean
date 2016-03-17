@@ -509,15 +509,25 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  -- Propositional Computational rules
 
-/- definition funext_comp {A : Type} {B : A → Type} {f g: Π (x : A), B x} (h : Π x : A, f x = g x) :
+ definition funext_comp {A : Type} {B : A → Type} {f g: Π (x : A), B x} (h : Π x : A, f x = g x) :
      happly (funext h) = h :=
- by cases @fun_extensionality A B f g with p q; cases p with funext comp; exact comp -/
+ by unfold [happly,funext]; cases @fun_extensionality A B f g with p q; cases p with funxt comprule; exact (comprule h)
+
+ definition funext_uniq {A : Type} {B : A → Type} {f g: Π (x : A), B x} (p : f = g) :
+     funext (happly p) = p :=
+ begin
+   cases @fun_extensionality A B f g with α β, cases β with funext' uniqrule,
+   apply ((show funext (happly p) = funext' (happly p), from calc
+     funext (happly p) = funext' (happly (funext (happly p))) : uniqrule (funext (happly p))
+     ... = funext' (happly p) : funext_comp)
+   ⬝ uniqrule p)
+ end
 
  -- Higher Groupoid Structure
 
-/- definition pi_refl {A : Type}  {B : A → Type} {f : Π (x : A), B x} :  
+ definition pi_refl {A : Type}  {B : A → Type} {f : Π (x : A), B x} :  
      refl f = funext (happly (refl f) ) :=             
- by apply idp -/
+ (funext_uniq (refl f))⁻¹
 
  -- Transporting non-dependent and dependent functions
 
