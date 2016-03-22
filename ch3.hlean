@@ -270,14 +270,13 @@ definition universe_not_set :
 
  /- §3.7 (Propositional truncation)  -/
 
- namespace trunc
+ inductive truncation (A : Type) : Type :=
+ | mk : A → truncation A
 
- inductive trunc (A : Type) : Type :=
- | mk : A → trunc A
-
- constant get_prop {A : Type} : trunc A → isProp (trunc A) 
+ constant isTrunc (A : Type) : isProp (truncation A) 
  
- notation `║` A `║`  := trunc A
+ notation `║` A `║`  := truncation A
+ notation `|` a `|`  := truncation.mk a
 
  definition lor (P Q : Type) : Type :=
    ║P + Q║
@@ -289,10 +288,30 @@ definition universe_not_set :
 
  notation `∃` binder `,` x :(scoped P, lexists _ P) := x
 
- end trunc
+ -- Truncation commutes with the function type
+
+ definition trunc_distrib (f : ║A → B║) :
+     (║A║ → ║B║) :=
+ λ a, truncation.rec_on a (λ a', truncation.rec_on f (λ f', |f' a'|) )
 
  --
 
  /- §3.8 (The axiom of choice)  -/ 
 
+ --
+
+ /- §3.9 (The principle of unique choice)  -/ 
+
+ -- Lemma 3.9.1
+
+ definition prop_eq_trunc (H : isProp P) :
+     P ≃ ║P║ :=
+ prop_eqv H (isTrunc P) (λ p, |p|) ( λ x, truncation.rec_on x (λ p, p))
+
+ -- Corollary 3.9.2 (The principle of unique choice)
+
+ definition puc {P : A → Type} (H₁ : Π (x : A), isProp (P x)) (H₂ : Π (x : A), ║P x║) :
+     Π (x : A), P x :=
+ λ x, (pr1 (prop_eq_trunc (H₁ x))⁻¹) (H₂ x)
  
+ --
