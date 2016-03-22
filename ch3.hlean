@@ -81,16 +81,6 @@ open eq prod unit bool sum sigma ua funext nat lift
  definition bneg_eq :
      𝟮 ≃ 𝟮 :=
  sigma.mk bneg (qinv_to_isequiv bneg (sigma.mk bneg (λ x, bool.rec_on x idp idp,λ x, bool.rec_on x idp idp) ))
-
- --
- universe variables i j -- superfluous
-
- definition ua_comp {A B: Type.{i}} (e : A ≃ B):   --- in ch2, but I don't know why it isn't compiling!
-     idtoeqv (ua e) = e := sorry
- 
- definition ua_uniq {A B: Type.{i}} (p : A = B):   --- in ch2, but I don't know why it isn't compiling!
-     ua (idtoeqv p) = p := sorry
-
  
 definition universe_not_set :
      isSet(Type₀) → 𝟬 :=
