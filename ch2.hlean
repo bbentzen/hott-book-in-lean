@@ -330,6 +330,8 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
    sigma.rec_on e' (λ (g : B → A) (p : (f ∘ g ~ id B) × (g ∘ f ~ id A)),
      sigma.mk g (prod.mk (sigma.mk f (pr2 p)) (sigma.mk f (pr1 p)))  )  )  
 
+ notation H `⁻¹` := typeq_sym H
+
  definition typeq_trans (H₁ : A ≃ B) (H₂ : B ≃ C) :
      A ≃ C :=
  sigma.rec_on H₁ (λ (f : A → B) (e₁ : isequiv f),
@@ -343,6 +345,8 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
        have q₂ : (f' ∘ g') ∘ (g ∘ f) ~ id A, from
          (f' ~ₗ (hom_comp_assoc f g g')) ~~ (f' ~ₗ (((pr2 p₂) ~ᵣ f) ~~ id_lu f)) ~~ (pr2 p₁),
        sigma.mk (g ∘ f) (prod.mk (sigma.mk (f' ∘ g') q₁) (sigma.mk (f' ∘ g')  q₂))   ) ) ) )
+
+ notation H₁ `∘` H₂ := typeq_trans H₁ H₂
 
  --
 
@@ -804,20 +808,11 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  -- Propositional Computation and Uniqueness rules
 
-/- definition nat_uniq (m n : ℕ) (p : m = n) :
-     natdecode m n (natencode m n p) = p :=
- by induction p; induction m; reflexivity; rewrite [↑natencode,↑natdecode,↑r,v_0]
+ definition nat_uniq {m n : ℕ} (p : m = n) :
+     natdecode m n (natencode p) = p :=
+ by induction p; unfold natencode; induction m with m IH; reflexivity; rewrite [↑natdecode,↑r,IH]
 
--- decode (succ i) (succ i) r(i) = refl (succ i)
-
---; apply (ap succ v_0)
---  definition nat_uniq: Π (m n : ℕ) (p : m = n),
--- | nat_uniq 0 0 (refl 0)  := idp
--- | nat_uniq (succ i) (succ i) (refl (succ i))  := ap succ (nat_uniq i i (refl i))
-
- -- Theorem 2.13.1 (Nat is equivalent to its encoding)
-
- definition nat_comp : Π (m n : ℕ) (c : natcode m n),
+/- definition nat_comp : Π (m n : ℕ) (c : natcode m n),
      natencode m n (natdecode m n c) = c
  | nat_comp 0        0 c  := @unit_eq (r 0) c c
  | nat_comp (succ i) 0 c  := empty.rec_on _ c
@@ -826,10 +821,9 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      natencode (succ i) (succ j) (natdecode (succ i) (succ j) c) = transport (natcode (succ i)) (ap succ (natdecode i j c)) (r (succ i)) : idp
      ... = transport (λ x, natcode (succ i) (succ x)) (natdecode i j c) (r (succ i)) : sorry
      ... = natencode i j (natdecode i j c) : sorry
-     ... = c : idp
--/
+     ... = c : idp -/
 
- -- Theorem 2.13.1
+ -- Theorem 2.13.1 (Nat is equivalent to its encoding)
 
  definition nat_eq (m n : ℕ) : 
    (m = n) ≃ natcode m n :=
@@ -939,5 +933,34 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      (Π (w : A × B), C w) ≃ (Π (a : A) (b : B), C (a,b)) :=
  let qinv := λ g w, prod.rec_on w (λ a b, g a b ) in
  have α : dccadj ∘ qinv ~ id _, from λ g, idp,
- have β : Π f, qinv (dccadj f)= f, from begin intro f, apply funext, intro x, cases x with a b, reflexivity end,
- ⟨dccadj, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
+ have β : Π f, qinv (dccadj f)= f, from begin intro f, apply funext, intro x,
+  cases x with a b, reflexivity end, ⟨dccadj, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
+
+-- Sigma types "mapping out" dependent UP
+ 
+ definition sigccadj {B : A → Type} {C : (Σ (x : A), B x) → Type}:
+     (Π (w : Σ (x : A), B x), C w) → (Π (x : A) (y : B x), C ⟨x,y⟩) :=
+ λ f x y, f ⟨x,y⟩
+
+ definition sigccadj_eq {B : A → Type} {C : (Σ (x : A), B x) → Type}:
+     (Π (w : Σ (x : A), B x), C w) ≃ (Π (x : A) (y : B x), C ⟨x,y⟩) :=
+ let qinv := λ g w, sigma.rec_on w (λ x y, g x y ) in
+ have α : sigccadj ∘ qinv ~ id _, from λ g, idp,
+ have β : Π f, qinv (sigccadj f)= f, from begin intro f, apply funext, intro x,
+  cases x with a b, reflexivity end, ⟨sigccadj, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
+
+ -- Path induction is part of "mapping out" UP of identity types
+
+ definition pathind_inv {a : A} {B : Π (x : A), a = x → Type} :
+     (Π (x : A) (p : a = x), B x p) → B a (refl a) :=
+ λ f, f a (refl a)
+
+ definition pathind_eq {a : A} {B : Π (x : A), a = x → Type} :
+     (Π (x : A) (p : a = x), B x p) ≃ B a (refl a) :=
+ let pathind := λ g x p, eq.rec_on p g in
+ have α : pathind_inv ∘ pathind ~ id _, from λ g, idp,
+ have β : Π f, pathind (pathind_inv f)= f, from begin intro f, apply funext,
+  intro x, apply funext, intro x_1, induction x_1, reflexivity end,
+ ⟨pathind_inv, (⟨pathind, α⟩, ⟨pathind, β⟩)⟩
+
+ --
