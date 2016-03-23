@@ -231,13 +231,13 @@ definition universe_not_set :
      isProp (A × B) :=
  λ x y, prod.rec_on x (λ a b, prod.rec_on y (λ a' b', pair_eq (H₁ a a', H₂ b b')))
 
- definition sigma_preserves_prop (H₁ : isProp A) (B : A → Type) (H₂ : Π (x : A), isProp (B x)) :
+ definition sigma_preserves_prop (H₁ : isProp A) {B : A → Type} (H₂ : Π (x : A), isProp (B x)) :
      isProp (Σ (x : A), B x) :=
  λ w w', sigma.rec_on w (λ w1 w2, sigma.rec_on w' (λ w1' w2', sigma_eq ⟨H₁ w1 w1', H₂ w1' (transport B (H₁ w1 w1') w2) w2' ⟩  ))
 
  -- Example 3.6.2
 
- definition pi_preserves_prop (H₁ : isProp A) (B : A → Type) (H₂ : Π (x : A), isProp (B x)) :
+ definition pi_preserves_prop (H₁ : isProp A) {B : A → Type} (H₂ : Π (x : A), isProp (B x)) :
      isProp (Π (x : A), B x) :=
  λ f g, funext (λ x, H₂ x (f x) (g x))
 
@@ -278,6 +278,8 @@ definition universe_not_set :
 
  notation `∃` binder `,` x :(scoped P, lexists _ P) := x
 
+ notation P `↔` Q  := (P → Q) × (Q → P)
+
  -- Truncation commutes with the function type
 
  definition trunc_distrib (f : ║A → B║) :
@@ -303,5 +305,49 @@ definition universe_not_set :
  definition puc {P : A → Type} (H₁ : Π (x : A), isProp (P x)) (H₂ : Π (x : A), ║P x║) :
      Π (x : A), P x :=
  λ x, (pr1 (prop_eq_trunc (H₁ x))⁻¹) (H₂ x)
+ 
+ --
+
+ /- §3.11 (Contractibility)  -/ 
+
+ -- Definition 3.11.1
+
+ definition isContr (A : Type) : Type :=
+   Σ (a : A), Π (x : A), a = x
+
+ -- Lemma 3.11.3
+
+ definition contr_iff_pprop :
+     isContr A ↔ Σ (a : A), isProp A :=
+ (λ c, ⟨pr1 c, (λ x y, ((pr2 c) x)⁻¹ ⬝ ((pr2 c) y) )⟩,
+  λ w, ⟨ pr1 w, λ (x : A), (pr2 w) (pr1 w) x⟩ )
+
+ definition pprop_if_unit {A : Type₀}:
+     (Σ (a : A), isProp A) ↔ (A ≃ 𝟭) :=
+ (λ w, prop_eqv_unit (pr1 w) (pr2 w),
+  λ e, ⟨ transport (λ x, x) (ua e)⁻¹ ⋆, transport isProp (ua e)⁻¹ unit_is_prop ⟩)
+
+ definition contr_iff_unit :
+     isContr A → (A ≃ 𝟭) :=
+ λ c, (λ w, prop_eqv_unit (pr1 w) (pr2 w)) ((pr1 contr_iff_pprop) c)
+
+ -- Lemma 3.11.4
+
+ definition isContr_is_prop :
+     isProp (isContr A) :=
+ λ c c', sigma.rec_on c (λ a p,  sigma.rec_on c' (λ a' p', (sigma_eq ⟨p a', funext (λ (x : A), 
+   (prop_is_set (pr2 ((pr1 contr_iff_pprop) ⟨a,p⟩))) a' x ((transport _ (p a') p) x) (p' x) )⟩) ))
+
+ -- Corollary 3.11.5
+
+ definition contr_to_isContr :
+     isContr A → isContr (isContr A) :=
+ λ c, pr2 contr_iff_pprop ⟨ c, isContr_is_prop ⟩
+
+ -- Lemma 3.11.6
+
+ definition pi_preserves_contr {P : A → Type} (c : Π (a : A), isContr (P a)) :
+     isContr (Π (a : A), P a) :=
+ pr2 (@contr_iff_pprop (Π (a : A), P a)) ⟨ λ a, pr1 (c a), pi_preserves_prop (λ a, pr2 (pr1 contr_iff_pprop (c a))) ⟩
  
  --
