@@ -237,13 +237,13 @@ definition universe_not_set :
 
  -- Example 3.6.2
 
- definition pi_preserves_prop (H₁ : isProp A) {B : A → Type} (H₂ : Π (x : A), isProp (B x)) :
+ definition pi_preserves_prop {B : A → Type} (H : Π (x : A), isProp (B x)) :
      isProp (Π (x : A), B x) :=
- λ f g, funext (λ x, H₂ x (f x) (g x))
+ λ f g, funext (λ x, H x (f x) (g x))
 
- definition func_preserves_prop (H₁ : isProp A) (H₂ : isProp B) :
+ definition func_preserves_prop (H : isProp B) :
      isProp (A → B) :=
- λ f g, funext (λ x, H₂ (f x) (g x))
+ λ f g, funext (λ x, H (f x) (g x))
 
  definition neg_preserves_prop (H : isProp A) :
      isProp (¬A) :=
@@ -350,4 +350,33 @@ definition universe_not_set :
      isContr (Π (a : A), P a) :=
  pr2 (@contr_iff_pprop (Π (a : A), P a)) ⟨ λ a, pr1 (c a), pi_preserves_prop (λ a, pr2 (pr1 contr_iff_pprop (c a))) ⟩
  
+ -- Lemma 3.11.7 (Retractions)
+
+ definition retrac_contr (c : isContr A) (r : A → B) (s : B → A) (ε : Π (y : B), r (s y) = y) :
+     isContr B := 
+ by induction c with a p; apply ⟨ r a, λ y, ap r (p (s y)) ⬝ ε y ⟩
+
+ -- Lemma 3.11.8
+
+ definition path_contr (a : A) :
+     isContr (Σ (x : A), a = x ) := 
+ ⟨ ⟨a,refl a⟩, λ w, sigma.rec_on w (λ a' p, sigma_eq ⟨p, eq.rec_on p (refl (refl a))⟩ ) ⟩  
+
+ -- Lemma 3.11.8 (i)
+
+ definition contr_eq_i (P : A → Type) (g : Π (x : A), isContr (P x)) :
+     (Σ (x : A), P x) ≃ A := 
+ let qinv := λ a, ⟨a, pr1 (g a)⟩ in
+ have α : pr1 ∘ qinv ~ id A, from λ x, idp,
+ have β : qinv ∘ pr1 ~  id _, from
+   λ w, sigma.rec_on w (λ a p, sigma_eq ⟨refl a, (pr2 (g a)) p⟩),
+ ⟨(λ x, pr1 x), (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
+ 
+ -- Lemma 3.11.10 (Contractible types as ─2-types)  
+
+ definition prop_iff_contr_path (A : Type) :  
+     isProp A ↔ Π (x y : A), isContr (x = y) :=
+ (λ H x y, ⟨(H x y), λ p, (prop_is_set H) x y (H x y) p⟩,
+  λ c x y, pr1 (c x y) )
+
  --
