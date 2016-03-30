@@ -128,15 +128,15 @@ open eq prod sum sigma
      ap f ( p ⬝ q ) = (ap f p) ⬝ (ap f q) := 
  eq.rec_on q (eq.rec_on p (refl ((ap f (refl x)) ⬝ (ap f (refl x)))  ) )
 
- definition ap_func_ii {x y z : A} (f : A → B) (p : x = y) :
+ definition ap_func_ii {x y : A} (f : A → B) (p : x = y) :
     ap f ( p⁻¹ ) = (ap f p)⁻¹ :=
  eq.rec (refl (ap f (refl x))) p
 
- definition ap_func_iii {x y z : A} (f : A → B) (g : B → A) (p : x = y) :
+ definition ap_func_iii {x y : A} (f : A → B) (g : B → A) (p : x = y) :
     ap g ( ap f p ) = (ap (g ∘ f) p) :=
  eq.rec (refl (ap (g ∘ f) (refl x))) p
  
- definition ap_func_iv {x y z : A} (p : x = y) :
+ definition ap_func_iv {x y : A} (p : x = y) :
     ap (id A) ( p ) = p :=
  eq.rec (refl (refl x)) p
 
