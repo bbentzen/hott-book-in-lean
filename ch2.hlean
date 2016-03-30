@@ -808,26 +808,26 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  -- Propositional Computation and Uniqueness rules
 
- definition nat_uniq {m n : ℕ} (p : m = n) :
-     natdecode m n (natencode p) = p :=
- by induction p; unfold natencode; induction m with m IH; reflexivity; rewrite [↑natdecode,↑r,IH]
-
-/- definition nat_comp : Π (m n : ℕ) (c : natcode m n),
-     natencode m n (natdecode m n c) = c
+ definition nat_comp : Π (m n : ℕ) (c : natcode m n),
+     natencode (natdecode m n c) = c
  | nat_comp 0        0 c  := @unit_eq (r 0) c c
  | nat_comp (succ i) 0 c  := empty.rec_on _ c
  | nat_comp 0  (succ j) c := empty.rec_on _ c
  | nat_comp (succ i) (succ j) c := calc
-     natencode (succ i) (succ j) (natdecode (succ i) (succ j) c) = transport (natcode (succ i)) (ap succ (natdecode i j c)) (r (succ i)) : idp
-     ... = transport (λ x, natcode (succ i) (succ x)) (natdecode i j c) (r (succ i)) : sorry
-     ... = natencode i j (natdecode i j c) : sorry
-     ... = c : idp -/
+     natencode (natdecode (succ i) (succ j) c) = transport (natcode (succ i)) (ap succ (natdecode i j c)) (r (succ i)) : idp
+     ... = transport (λ x, natcode (succ i) (succ x)) (natdecode i j c) (r (succ i)) : trans_ap_fun
+     ... = natencode (natdecode i j c) : idp
+     ... = c : nat_comp i j
+
+ definition nat_uniq {m n : ℕ} (p : m = n) :
+     natdecode m n (natencode p) = p :=
+ by induction p; unfold natencode; induction m with m IH; reflexivity; rewrite [↑natdecode,↑r,IH]
 
  -- Theorem 2.13.1 (Nat is equivalent to its encoding)
 
  definition nat_eq (m n : ℕ) : 
    (m = n) ≃ natcode m n :=
- ⟨natencode, ( ⟨natdecode m n, sorry⟩, ⟨natdecode m n, nat_uniq⟩ ) ⟩
+ ⟨natencode, ( ⟨natdecode m n, nat_comp m n⟩, ⟨natdecode m n, nat_uniq⟩ ) ⟩
 
  --
  
