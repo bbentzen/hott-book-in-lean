@@ -827,7 +827,7 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  definition nat_eq (m n : ℕ) : 
    (m = n) ≃ natcode m n :=
- sorry
+ ⟨natencode, ( ⟨natdecode m n, sorry⟩, ⟨natdecode m n, nat_uniq⟩ ) ⟩
 
  --
  
