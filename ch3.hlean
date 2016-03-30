@@ -372,6 +372,23 @@ definition universe_not_set :
    λ w, sigma.rec_on w (λ a p, sigma_eq ⟨refl a, (pr2 (g a)) p⟩),
  ⟨(λ x, pr1 x), (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
  
+ -- Lemma 3.11.8 (ii)
+
+ definition contr_eq_ii (P : A → Type) (c : isContr A) :
+     (Σ (x : A), P x) ≃ P (pr1 c) := 
+ let contreq := λ w, transport P ((pr2 c) (pr1 w))⁻¹ (pr2 w) in  -- →
+ let qinv := λ p, ⟨ pr1 c, p⟩ in                              -- ← 
+ have α : Π x : P (pr1 c), contreq (qinv x) = x, from λ x,    
+   (happly (ap (transport P)
+    (prop_is_set (pr2 ((pr1 contr_iff_pprop) c)) -- this show that ((pr2 c) (pr1 c))⁻¹
+    (pr1 c) (pr1 c) ((pr2 c) (pr1 c))⁻¹ (refl (pr1 c)))) x), -- equals refl (pr1 c)
+ have β : Π w : (Σ (x : A), P x), (qinv (contreq w)) = w, from
+  begin
+    intro w, cases w with w1 w2, esimp at *,
+    induction ((pr2 c) w1), reflexivity
+  end,   
+ ⟨contreq, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
+ 
  -- Lemma 3.11.10 (Contractible types as ─2-types)  
 
  definition prop_iff_contr_path (A : Type) :  
@@ -380,3 +397,4 @@ definition universe_not_set :
   λ c x y, pr1 (c x y) )
 
  --
+ 
