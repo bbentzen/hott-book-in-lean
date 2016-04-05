@@ -121,7 +121,7 @@ definition universe_not_set :
    bneg (f 𝟮 u) = sigma.pr1 bneg_eq (f 𝟮 u)  : idp
    ...          = sigma.pr1 (idtoeqv (ua bneg_eq)) (f 𝟮 u) :  happly (ap sigma.pr1 (ua_comp bneg_eq)⁻¹) (f 𝟮 u)
    ...          = sigma.pr1 (idtoeqv (ap (λ (a : Type₀), a) (ua bneg_eq))) (f 𝟮 u) :
-                    (happly (ap sigma.pr1 (ap idtoeqv (@ap_func_iv Type₀ 𝟮 𝟮 𝟮 (ua bneg_eq)))) (f 𝟮 u))⁻¹  )⁻¹
+                    (happly (ap sigma.pr1 (ap idtoeqv (@ap_func_iv Type₀ 𝟮 𝟮 (ua bneg_eq)))) (f 𝟮 u))⁻¹  )⁻¹
 
  definition ap_ua_lemma (f : Π (A : Type₀), ¬¬A → A) (u : ¬¬𝟮) :
      (f 𝟮) u = bneg ((f 𝟮) u) :=
