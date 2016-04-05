@@ -22,26 +22,37 @@ open eq prod unit bool sum sigma ua funext nat lift
  definition isSet (A : Type) : Type :=
    Π (x y : A) (p q : x = y), p = q
 
- -- Example 3.1.2
+ -- Example 3.1.2 (𝟭 is a set)
 
  definition unit_is_set : isSet(𝟭) :=
  λ (x y : 𝟭) (p q : x = y), ((transport _ (ua (@unit_equiv x y))⁻¹ (λ x y, @unit_eq x y x)) p q)
 
- -- Example 3.1.3
+ -- Example 3.1.3 (𝟬 is a set)
 
  definition empty_is_set : isSet(𝟬) :=
  λ (x y : 𝟬) (p q : x=y), (empty.rec_on _ x)
 
- -- Example 3.1.4
+ -- Example 3.1.4 (ℕ is a set)
 
- definition emptyalleq (x y : 𝟬) : x = y := empty.rec_on _ x
-
-/- example : isSet(ℕ) :=
- by intro m n p q; induction m; induction n; exact (transport _ (ua (nat_eq 0 0))⁻¹ (λ x y, unitalleq x y) p q);
-   exact (transport _ (ua (nat_eq 0 (succ a)))⁻¹ (λ x y, emptyalleq x y) p q); induction n;
-   exact (transport _ (ua (nat_eq (succ a) 0))⁻¹ (λ x y, emptyalleq x y) p q)
-
--/
+ definition nat_is_set : isSet(ℕ) :=
+ assert natcode_eq : Π (m n : ℕ) (p q : natcode m n), p = q, from
+ begin
+  intro m n, revert n, induction m with m IHm,
+   {intro n p q, induction n with n IHn,
+    apply (@unit_eq p q p), apply (empty.rec_on _ _)},
+   {intro n p q, induction n with n IHn,
+    apply (empty.rec_on _ _),
+    apply IHm n}
+ end,
+ begin
+   intro m n, revert n, induction m with m IHm,
+    {intro n p q, induction n with n IHn,
+     exact (transport _ (ua (nat_eq 0 0))⁻¹ (λ x y, @unit_eq x y x) p q),
+     exact (transport _ (ua (nat_eq 0 (succ n)))⁻¹ (λ x y, empty.rec_on _ x) p q)},
+    intro n p q, induction n with n IHn,
+    exact (transport _ (ua (nat_eq (succ m) 0))⁻¹ (λ x y, empty.rec_on _ x) p q),
+    exact (transport _ (ua (nat_eq (succ m) (succ n)))⁻¹ (λ x y, natcode_eq (succ m) (succ n) x y) p q)
+ end
 
  -- Type forming operators preserve sets
 
