@@ -964,3 +964,25 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  ⟨pathind_inv, (⟨pathind, α⟩, ⟨pathind, β⟩)⟩
 
  --
+ 
+ /- Selected Exercises -/
+ 
+  -- Exercise 2.10 (required later in 4.1.1)
+
+ definition sigma_assoc (B : A → Type) (C : (Σ (x : A), B x) → Type) :
+     (Σ (x : A) (y : B x), C ⟨x,y⟩)  ≃  (Σ (p : Σ (x : A), B x), C p) :=
+ let sigma_f := λ w, ⟨⟨pr1 w, pr1 (pr2 w)⟩, pr2 (pr2 w)⟩ in
+ let sigma_g := λ h, sigma.rec_on h (λ h1 h2, sigma.rec_on h1 (λ w1 w2 h2 , ⟨w1,⟨w2,h2⟩⟩ ) h2) in
+ have η : Π (h : Σ (p : Σ (x : A), B x), C p), sigma_f (sigma_g h) = h, from
+  begin intro h, cases h with h1 h2, cases h1 with w1 w2, reflexivity end,
+ have ε : Π (w : Σ (x : A) (y : B x), C ⟨x,y⟩), sigma_g (sigma_f w) = w, from
+  begin intro h, cases h with h1 h2, cases h2 with w1 w2, reflexivity end,
+ ⟨sigma_f, (⟨sigma_g,η⟩,⟨sigma_g,ε⟩)⟩
+ 
+  -- Exercise 2.14 
+
+ -- Let p : x = y, then x ≡ y and p = refl x is a well-formed type.
+ -- But by induction, it suffices to assume that p is refl x.
+ -- Then refl(refl x) is a proof of p = refl x.
+ 
+ --
