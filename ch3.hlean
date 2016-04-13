@@ -373,7 +373,13 @@ definition universe_not_set :
      isContr (Σ (x : A), a = x ) := 
  ⟨ ⟨a,refl a⟩, λ w, sigma.rec_on w (λ a' p, sigma_eq ⟨p, eq.rec_on p (refl (refl a))⟩ ) ⟩  
 
- -- Lemma 3.11.8 (i)
+ -- If contractible center is in the right
+
+ definition path_contr_r (a : A) :
+     isContr (Σ (x : A), x = a ) := 
+ ⟨ ⟨a,refl a⟩, λ w, sigma.rec_on w (λ a' p, sigma_eq ⟨ p⁻¹, eq.rec_on p idp ⟩ ) ⟩  
+
+ -- Lemma 3.11.9 (i)
 
  definition contr_eq_i (P : A → Type) (g : Π (x : A), isContr (P x)) :
      (Σ (x : A), P x) ≃ A := 
@@ -383,7 +389,7 @@ definition universe_not_set :
    λ w, sigma.rec_on w (λ a p, sigma_eq ⟨refl a, (pr2 (g a)) p⟩),
  ⟨(λ x, pr1 x), (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
  
- -- Lemma 3.11.8 (ii)
+ -- Lemma 3.11.9 (ii)
 
  definition contr_eq_ii (P : A → Type) (c : isContr A) :
      (Σ (x : A), P x) ≃ P (pr1 c) := 
