@@ -415,3 +415,36 @@ definition universe_not_set :
 
  --
  
+ /- Selected Exercises -/
+
+ universe variables i
+
+ -- Exercise 3.1
+
+ definition eq_set {A B : Type.{i}} :
+     (A ≃ B) → isSet A → isSet B :=
+ λ e H, transport _ (ua e) H
+
+ -- Similarly for mere propositions
+
+ definition eq_prop {A B : Type.{i}} :
+     (A ≃ B) → isProp A → isProp B :=
+ λ e H, transport _ (ua e) H
+
+ -- Exercise 3.2
+
+ definition sum_preserves_sets {A B : Type.{i}}:
+     isSet A → isSet B → isSet (A + B) :=
+ begin
+  intro H₁ H₂ w w' p q, cases w with a b,
+  cases w' with a' b',
+   exact (eq_prop (@inl_eq A B a a')⁻¹ (H₁ a a') p q), -- inl a = inl a'
+   exact (eq_prop (@inlr_eq A B a b')⁻¹ (λ x y : lift 𝟬, empty.rec_on _ (down x)) p q), -- inl a = inr b'
+  cases w' with a' b',
+   exact sorry, -- same as above, but requires a mirror proof of `sum_eq` fixing inr on the right,
+   exact sorry -- which is straightfoward and boring
+ end
+ 
+ -- Exercise 3.20 (see `contr_eq_ii` above)
+ 
+ --
