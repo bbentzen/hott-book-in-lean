@@ -755,7 +755,7 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
 
  -- Theorem 2.12.5 
 
- definition code_equiv (x : A' + B') :
+ definition sum_equiv (x : A' + B') :
      (inl a₀ = x) ≃ code x :=
  ⟨ encode x, ( ⟨decode x, sum_beta x⟩, ⟨decode x, sum_uniq x⟩ ) ⟩ 
 
