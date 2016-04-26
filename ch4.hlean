@@ -71,27 +71,51 @@ open eq prod unit bool sum sigma ua funext nat lift
  transport _ (ua_comp e) (eq.rec_on (ua e) qinv_id) -- follows by induction on (ua e) ⇒ pr1 e = pr1 (ua (refl A)) = id 
  
  --
- 
-  --
+
+ --
 
  /- §4.2 (Half adjoint equivalences)  -/ 
 
  definition ishae (f : A → B) : Type :=
      Σ (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A), Π (x : A), ap f (η x) = ε (f x)
 
- definition qinv_to_ishae (f : A → B) :
-     qinv f → ishae f :=
- begin
-  intro e, cases e with g w, cases w with ε η, apply ( ⟨g, ⟨ (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) , ⟨η,
-   show Π (x : A), ap f (η x) = (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) (f x), from
-    sorry
-  ⟩⟩⟩ )
- end
- 
- -- Useful lemmas
- 
- definition ap_higher_eq {x y : A} {p q : x = y} (f : A → B) (α : p = q) :
+ -- Theorem 4.2.3 (Having a Quasi-inverse implies a Half adjoint equivalence)
+
+ -- Defining τ demands a great deal of computation, so we do it separetly to help the elaborator
+
+ definition ap_ap_eq {x y : A} {p q : x = y} (f : A → B) (α : p = q) :
      ap f p = ap f q :=
  begin induction α, reflexivity end
+
+ definition tau_coro244 (f : A → B) (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A) (a : A) :
+     ap f (η (g (f a))) ⬝ ε (f a) = (ε (f (g (f a)))) ⬝ ap f (η a) :=
+ ((ap_ap_eq f (@hom_ap_id A a (g ∘ f) η)) ⬝ᵣ (ε (f a))) ⬝     -- corollary 2.4.4 
+ (((ap_ap_eq f (ap_func_iii f g (η a)))⁻¹ ⬝ (ap_func_iii g f (ap f (η a)))) ⬝ᵣ (ε (f a))) ⬝ -- lemma 2.2.2 (iv) [ap and ∘ commutes]
+ (@hom_ap B B (f (g (f a))) (f a) (f ∘ g) (id B) ε (ap f (η a))) ⬝ -- application of lemma 2.4.3
+ ((ε (f (g (f a)))) ⬝ₗ ap_func_iv (ap f (η a))) -- cancellation of id B
+
+ definition comp1_423 (f : A → B) (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A) (a : A) :
+     (ε (f (g (f a))))⁻¹ ⬝ (ε (f (g (f a)))) ⬝ ap f (η a) = ap f (η a) :=
+ ((left_inv (ε (f (g (f a)))) ⬝ᵣ ap f (η a)) ⬝ (lu (ap f (η a)) )⁻¹)
+
+ definition comp2_423 (f : A → B) (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A) (a : A) :
+    (ε (f (g (f a))))⁻¹ ⬝ (ap f (η (g (f a))) ⬝ ε (f a)) = (ε (f (g (f a))))⁻¹ ⬝ ((ε (f (g (f a)))) ⬝ ap f (η a)) :=
+ (ε (f (g (f a))))⁻¹  ⬝ₗ tau_coro244 f g ε η a
+
+ definition comp3_423 (f : A → B) (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A) (a : A) :
+   (ε (f (g (f a))))⁻¹ ⬝ ap f (η (g (f a))) ⬝ ε (f a) = (ε (f (g (f a))))⁻¹ ⬝ ((ε (f (g (f a)))) ⬝ ap f (η a)) :=
+ (conc_assoc (ε (f (g (f a))))⁻¹ (ap f (η (g (f a)))) (ε (f a)) )⁻¹ ⬝  comp2_423 f g ε η a
+
+ -- Definition of τ
+
+ definition tau_qinv (f : A → B) (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A) :
+     Π (a : A), ap f (η a) = (ε (f (g (f a))))⁻¹ ⬝ ap f (η (g (f a))) ⬝ ε (f a) :=
+ λ a, (comp3_423 f g ε η a ⬝ conc_assoc (ε (f (g (f a))))⁻¹ (ε (f (g (f a)))) (ap f (η a)) ⬝ comp1_423 f g ε η a)⁻¹
+
+ -- Theorem 4.2.3 
+
+ definition qinv_to_ishae (f : A → B) :
+     qinv f → ishae f :=
+ λ e, sigma.rec_on e (λ g w, prod.rec_on w (λ ε η, ⟨g, ⟨ (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) , ⟨η, tau_qinv f g ε η ⟩⟩⟩ ))
  
  --
