@@ -66,6 +66,24 @@ open eq prod unit bool sum sigma ua funext nat lift
      H₂ (pr2 x) (pr2 y) (ap pr2 p) (ap pr2 q)),
  (prod_uniq p)⁻¹ ⬝ (ap pair_eq H) ⬝ prod_uniq q
 
+ -- Sigma type
+
+ definition sigma_preserves_sets (H₁ : isSet A) (B : A → Type) (H₂ : Π (x : A), isSet (B x)) :
+     isSet (Σ (x : A), B x) :=
+ begin
+   intro w w' p q,
+   apply ((sigma_uniq p)⁻¹ ⬝ ap sigma_eq (
+     show ap_sigma p = ap_sigma q, from
+     begin
+       cases w with a b, cases w' with a' b', apply (sigma_eq ⟨H₁ a a' (pr1 (ap_sigma p)) (pr1 (ap_sigma q)),
+         begin 
+           apply ((H₂ a') (transport B (pr1 (ap_sigma q)) b) b' 
+           (transport (λ (p : a = a'), transport B p b = b') (H₁ a a' (pr1 (ap_sigma p)) (pr1 (ap_sigma q))) (pr2 (ap_sigma p)))
+           (pr2 (ap_sigma q)) )
+         end ⟩)
+      end) ⬝ sigma_uniq q)
+ end
+
  -- Pi type
 
  definition pi_preserves_sets (B : A → Type) (H : Π (x : A), isSet (B x)) :
