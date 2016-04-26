@@ -71,3 +71,27 @@ open eq prod unit bool sum sigma ua funext nat lift
  transport _ (ua_comp e) (eq.rec_on (ua e) qinv_id) -- follows by induction on (ua e) ⇒ pr1 e = pr1 (ua (refl A)) = id 
  
  --
+ 
+  --
+
+ /- §4.2 (Half adjoint equivalences)  -/ 
+
+ definition ishae (f : A → B) : Type :=
+     Σ (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A), Π (x : A), ap f (η x) = ε (f x)
+
+ definition qinv_to_ishae (f : A → B) :
+     qinv f → ishae f :=
+ begin
+  intro e, cases e with g w, cases w with ε η, apply ( ⟨g, ⟨ (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) , ⟨η,
+   show Π (x : A), ap f (η x) = (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) (f x), from
+    sorry
+  ⟩⟩⟩ )
+ end
+ 
+ -- Useful lemmas
+ 
+ definition ap_higher_eq {x y : A} {p q : x = y} (f : A → B) (α : p = q) :
+     ap f p = ap f q :=
+ begin induction α, reflexivity end
+ 
+ --
