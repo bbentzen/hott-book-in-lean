@@ -346,7 +346,7 @@ definition universe_not_set :
 
  -- Lemma 3.11.3
 
- definition contr_iff_pprop :
+ definition contr_iff_pprop (A : Type) :
      isContr A ↔ Σ (a : A), isProp A :=
  (λ c, ⟨pr1 c, (λ x y, ((pr2 c) x)⁻¹ ⬝ ((pr2 c) y) )⟩,
   λ w, ⟨ pr1 w, λ (x : A), (pr2 w) (pr1 w) x⟩ )
@@ -356,29 +356,29 @@ definition universe_not_set :
  (λ w, prop_eqv_unit (pr1 w) (pr2 w),
   λ e, ⟨ transport (λ x, x) (ua e)⁻¹ ⋆, transport isProp (ua e)⁻¹ unit_is_prop ⟩)
 
- definition contr_iff_unit :
+ definition contr_iff_unit (A : Type) :
      isContr A → (A ≃ 𝟭) :=
- λ c, (λ w, prop_eqv_unit (pr1 w) (pr2 w)) ((pr1 contr_iff_pprop) c)
+ λ c, (λ w, prop_eqv_unit (pr1 w) (pr2 w)) ((pr1 (contr_iff_pprop A)) c)
 
  -- Lemma 3.11.4
 
- definition isContr_is_prop (A : Type):
+ definition isContr_is_prop (A : Type) :
      isProp (isContr A) :=
  λ c c', sigma.rec_on c (λ a p,  sigma.rec_on c' (λ a' p', (sigma_eq ⟨p a', funext (λ (x : A), 
-   (prop_is_set (pr2 ((pr1 contr_iff_pprop) ⟨a,p⟩))) a' x ((transport _ (p a') p) x) (p' x) )⟩) ))
+   (prop_is_set (pr2 ((pr1 (contr_iff_pprop A)) ⟨a,p⟩))) a' x ((transport _ (p a') p) x) (p' x) )⟩) ))
 
  -- Corollary 3.11.5
 
- definition contr_to_isContr :
+ definition contr_to_isContr (A : Type) :
      isContr A → isContr (isContr A) :=
- λ c, pr2 contr_iff_pprop ⟨ c, isContr_is_prop A⟩
+ λ c, pr2 (contr_iff_pprop (isContr A)) ⟨ c, isContr_is_prop A⟩ 
 
  -- Lemma 3.11.6
 
  definition pi_preserves_contr {P : A → Type} (c : Π (a : A), isContr (P a)) :
      isContr (Π (a : A), P a) :=
- pr2 (@contr_iff_pprop (Π (a : A), P a)) ⟨ λ a, pr1 (c a), pi_preserves_prop (λ a, pr2 (pr1 contr_iff_pprop (c a))) ⟩
- 
+ pr2 (@contr_iff_pprop (Π (a : A), P a)) ⟨ λ a, pr1 (c a), pi_preserves_prop (λ a, pr2 (pr1 (contr_iff_pprop (P a)) (c a))) ⟩
+
  -- Lemma 3.11.7 (Retractions)
 
  definition retrac_contr (c : isContr A) (r : A → B) (s : B → A) (ε : Π (y : B), r (s y) = y) :
@@ -389,7 +389,7 @@ definition universe_not_set :
 
  definition path_contr (a : A) :
      isContr (Σ (x : A), a = x ) := 
- ⟨ ⟨a,refl a⟩, λ w, sigma.rec_on w (λ a' p, sigma_eq ⟨p, eq.rec_on p (refl (refl a))⟩ ) ⟩  
+ ⟨ ⟨a,refl a⟩, λ w, sigma.rec_on w (λ a' p, sigma_eq ⟨p, eq.rec_on p (refl (refl a))⟩ ) ⟩
 
  -- If contractible center is in the right
 
@@ -397,7 +397,9 @@ definition universe_not_set :
      isContr (Σ (x : A), x = a ) := 
  ⟨ ⟨a,refl a⟩, λ w, sigma.rec_on w (λ a' p, sigma_eq ⟨ p⁻¹, eq.rec_on p idp ⟩ ) ⟩  
 
- -- Lemma 3.11.9 (i)
+ -- Lemma 3.11.9
+
+ -- (i)
 
  definition contr_eq_i (P : A → Type) (g : Π (x : A), isContr (P x)) :
      (Σ (x : A), P x) ≃ A := 
@@ -405,9 +407,9 @@ definition universe_not_set :
  have α : pr1 ∘ qinv ~ id A, from λ x, idp,
  have β : qinv ∘ pr1 ~  id _, from
    λ w, sigma.rec_on w (λ a p, sigma_eq ⟨refl a, (pr2 (g a)) p⟩),
- ⟨(λ x, pr1 x), (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
- 
- -- Lemma 3.11.9 (ii)
+ ⟨(λ x, pr1 x), (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
+
+ -- (ii)
 
  definition contr_eq_ii (P : A → Type) (c : isContr A) :
      (Σ (x : A), P x) ≃ P (pr1 c) := 
@@ -415,15 +417,15 @@ definition universe_not_set :
  let qinv := λ p, ⟨ pr1 c, p⟩ in                              -- ← 
  have α : Π x : P (pr1 c), contreq (qinv x) = x, from λ x,    
    (happly (ap (transport P)
-    (prop_is_set (pr2 ((pr1 contr_iff_pprop) c)) -- this show that ((pr2 c) (pr1 c))⁻¹
+    (prop_is_set (pr2 ((pr1 (contr_iff_pprop A)) c)) -- this show that ((pr2 c) (pr1 c))⁻¹
     (pr1 c) (pr1 c) ((pr2 c) (pr1 c))⁻¹ (refl (pr1 c)))) x), -- equals refl (pr1 c)
  have β : Π w : (Σ (x : A), P x), (qinv (contreq w)) = w, from
   begin
     intro w, cases w with w1 w2, esimp at *,
     induction ((pr2 c) w1), reflexivity
   end,   
- ⟨contreq, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩ 
- 
+ ⟨contreq, (⟨qinv, α⟩, ⟨qinv, β⟩)⟩
+
  -- Lemma 3.11.10 (Contractible types as ─2-types)  
 
  definition prop_iff_contr_path (A : Type) :  
