@@ -471,6 +471,15 @@ definition universe_not_set :
      isSet 𝟮 :=
  eq_set bool_eq_unit_unit⁻¹ (sum_preserves_sets unit_is_set unit_is_set)
  
+ -- Exercise 3.5
+
+ definition prop_eq_contr :
+     isProp A ≃ (A → isContr A) :=
+ prop_eqv (isProp_is_prop A) (func_preserves_prop (isContr_is_prop A))
+ (λ H a, ⟨a, λ x, H a x ⟩)  (λ f x y, ((pr2 (f x)) x)⁻¹ ⬝ ((pr2 (f x)) y))
+
+ -- Exercise 3.20 (in `contr_eq_ii` above)
+ 
  -- Exercise 3.20 (see `contr_eq_ii` above)
  
  --
