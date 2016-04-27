@@ -664,11 +664,16 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      λ (p : a = a'), eq.rec_on p (eq.rec_on (β a) (refl (refl (finv (f a)))) ),
   qinv_to_isequiv (ap f) ⟨λ q, (β a)⁻¹ ⬝ ap finv q ⬝ β a', (α',β')⟩))
 
- example {w w' : A × B} (p q : w = w') :
+ definition path_pair {w w' : A × B} (p q : w = w') :
      p = q ≃ (ap pr1 p = ap pr1 q) × (ap pr2 p = ap pr2 q) :=
  typeq_trans ⟨ap (λ x, (ap pr1 x, ap pr2 x)) , id_eq _ ( ⟨pair_eq, λ s, prod_beta s⟩, ⟨pair_eq, λ r, prod_uniq r⟩ ) ⟩ pair_equiv
 
- example {B : A → Type} {f g: Π (x : A), B x} {p q : f = g}  :
+ definition path_sigma {B : A → Type} {w w' : Σ (x : A), B x} (p q : w = w') :
+     (p = q) ≃  (Σ (r : pr1 (ap_sigma p) = pr1 (ap_sigma q)), transport (λ (s : pr1 w = pr1 w'), transport B s (pr2 w) = pr2 w')
+                 r (pr2 (ap_sigma p)) = pr2 (ap_sigma q)) :=
+ typeq_trans ⟨ap ap_sigma , id_eq ap_sigma ( ⟨sigma_eq, λ s, sigma_comp s⟩, ⟨sigma_eq, λ r, sigma_uniq r⟩ )⟩ sigma_equiv
+
+ definition path_funext {B : A → Type} {f g: Π (x : A), B x} {p q : f = g}  :
      p = q ≃ Π (x : A), (happly p x = happly q x) :=                 
  typeq_trans ⟨ap happly, id_eq happly fun_extensionality ⟩ ⟨happly, fun_extensionality⟩
 
