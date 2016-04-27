@@ -362,7 +362,7 @@ definition universe_not_set :
 
  -- Lemma 3.11.4
 
- definition isContr_is_prop :
+ definition isContr_is_prop (A : Type):
      isProp (isContr A) :=
  λ c c', sigma.rec_on c (λ a p,  sigma.rec_on c' (λ a' p', (sigma_eq ⟨p a', funext (λ (x : A), 
    (prop_is_set (pr2 ((pr1 contr_iff_pprop) ⟨a,p⟩))) a' x ((transport _ (p a') p) x) (p' x) )⟩) ))
@@ -371,7 +371,7 @@ definition universe_not_set :
 
  definition contr_to_isContr :
      isContr A → isContr (isContr A) :=
- λ c, pr2 contr_iff_pprop ⟨ c, isContr_is_prop ⟩
+ λ c, pr2 contr_iff_pprop ⟨ c, isContr_is_prop A⟩
 
  -- Lemma 3.11.6
 
