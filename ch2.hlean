@@ -1,13 +1,13 @@
 /-
-Copyright (c) 2015 Bruno Bentzen. All rights reserved.
+Copyright (c) 2016 Bruno Bentzen. All rights reserved.
 Released under the Apache License 2.0 (see "License");
 
-Theorems and exercises of the HoTT book (ch 2)
+Theorems and exercises of the HoTT book (Chapter 2)
 -/
 
 import .ch1 types.bool
 
-open eq prod sum sigma
+open eq prod sum sigma bool
 
 /- ************************************** -/
 /-    Ch.2 Homotopy Type Theory           -/
@@ -766,6 +766,14 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  definition inl_inr_neq (a₁ : B') : 
      (inl a₀ = inr a₁ ) ≃ lift empty :=
  code_equiv (inr a₁)
+
+ -- Remark 2.12.6
+
+ definition bool_eq_unit_unit :
+     𝟮 ≃ 𝟭 + 𝟭 :=
+ ⟨λ (b : 𝟮), bool.rec_on b (inl ⋆) (inr ⋆),
+ (⟨(λ (w : 𝟭 + 𝟭), sum.rec_on w (λ u, ff) (λ u, tt)), begin intro u, cases u, cases a, reflexivity, cases a, reflexivity end⟩, 
+  ⟨(λ (w : 𝟭 + 𝟭), sum.rec_on w (λ u, ff) (λ u, tt)), begin intro b, cases b, reflexivity, reflexivity end⟩) ⟩
 
  -- Transport of coproducts
 
