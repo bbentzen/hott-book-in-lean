@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2015 Bruno Bentzen. All rights reserved.
+Copyright (c) 2016 Bruno Bentzen. All rights reserved.
 Released under the Apache License 2.0 (see "License");
 
 Theorems and exercises of the HoTT book (Chapter 3)
@@ -68,7 +68,7 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- Sigma type
 
- definition sigma_preserves_sets (H₁ : isSet A) (B : A → Type) (H₂ : Π (x : A), isSet (B x)) :
+ definition sigma_preserves_sets (H₁ : isSet A) {B : A → Type} (H₂ : Π (x : A), isSet (B x)) :
      isSet (Σ (x : A), B x) :=
  begin
    intro w w' p q,
