@@ -463,6 +463,12 @@ definition universe_not_set :
    exact sorry -- which is straightfoward and boring
  end
  
+ -- Corollary (𝟮 is a set)
+
+ definition bool_is_set :
+     isSet 𝟮 :=
+ eq_set bool_eq_unit_unit⁻¹ (sum_preserves_sets unit_is_set unit_is_set)
+ 
  -- Exercise 3.20 (see `contr_eq_ii` above)
  
  --
