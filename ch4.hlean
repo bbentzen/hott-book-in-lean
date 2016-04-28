@@ -69,8 +69,6 @@ open eq prod unit bool sum sigma ua funext nat lift
  ((funext_qinv (id A))⁻¹ ∘ sig_prod_comm) ∘ @sigma_assoc (A → A) (λ g, g = id A) (λ h, pr1 h = id A) ∘ 
  (contr_eq_ii (λ h, pr1 h = id A) (@path_contr_r (A → A) (id A))) ∘ ⟨@happly A _ (id A) (id A), fun_extensionality⟩,
  transport _ (ua_comp e) (eq.rec_on (ua e) qinv_id) -- follows by induction on (ua e) ⇒ pr1 e = pr1 (ua (refl A)) = id 
- 
- --
 
  --
 
@@ -97,7 +95,7 @@ open eq prod unit bool sum sigma ua funext nat lift
     ap (ap g) (ap_func_iii g f (ε y)) ⬝      -- and apply g
     ap (ap g) (nat_ε ⬝ (τ (g y))⁻¹) ⬝
     ap_func_iii f g (η (g y)),
- (ap_func_iv (ap g (ε y)))⁻¹ ⬝  -- cancelation of (g ∘ f) through transport on η
+ (ap_func_iv (ap g (ε y)))⁻¹ ⬝  -- cancelation of (g ∘ f) through transport along η
  transport (λ h, ap h (ap g (ε y)) = ap h (η (g y))) (funext η) ap_τ' ⬝
  ap_func_iv (η (g y))
 
