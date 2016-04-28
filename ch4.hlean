@@ -76,8 +76,30 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  /- §4.2 (Half adjoint equivalences)  -/ 
 
+ -- Definition 4.2.1 (Half adjoint equivalence)
+
  definition ishae (f : A → B) : Type :=
      Σ (g : B → A) (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A), Π (x : A), ap f (η x) = ε (f x)
+
+ -- Lemma 4.2.2 (The coherence conditions are logically equivalent)
+
+ definition tau_implies_tau' {f : A → B} {g : B → A} (ε : f ∘ g ~ id B) (η : g ∘ f ~ id A) (τ : Π (x : A), ap f (η x) = ε (f x)) :
+     Π (y : B), ap g (ε y) = η (g y) :=
+ assume (y : B),
+ have nat_ε : ap (f ∘ g) (ε y) = ε (f (g y)), from -- naturality of ε 
+   ((ap (f ∘ g) (ε y)) ⬝ₗ (right_inv (ε y))⁻¹) ⬝ 
+    conc_assoc (ap (f ∘ g) (ε y)) (ε y) (ε y)⁻¹ ⬝ 
+    ((@hom_ap B B (f (g y)) y (f ∘ g) (id B) ε (ε y)) ⬝ᵣ (ε y)⁻¹) ⬝ 
+    ((ε (f (g y)) ⬝ₗ ap_func_iv (ε y)) ⬝ᵣ (ε y)⁻¹) ⬝ 
+    (conc_assoc (ε (f (g y))) (ε y) (ε y)⁻¹)⁻¹ ⬝ (ε (f (g y)) ⬝ₗ right_inv (ε y)),
+ have ap_τ' : ap (g ∘ f) (ap g (ε y)) = ap (g ∘ f) (η (g y)), from 
+   (ap_func_iii f g (ap g (ε y)))⁻¹ ⬝        -- we just instantiate τ with (g y) 
+    ap (ap g) (ap_func_iii g f (ε y)) ⬝      -- and apply g
+    ap (ap g) (nat_ε ⬝ (τ (g y))⁻¹) ⬝
+    ap_func_iii f g (η (g y)),
+ (ap_func_iv (ap g (ε y)))⁻¹ ⬝  -- cancelation of (g ∘ f) through transport on η
+ transport (λ h, ap h (ap g (ε y)) = ap h (η (g y))) (funext η) ap_τ' ⬝
+ ap_func_iv (η (g y))
 
  -- Theorem 4.2.3 (Having a Quasi-inverse implies a Half adjoint equivalence)
 
