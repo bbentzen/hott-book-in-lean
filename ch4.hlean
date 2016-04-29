@@ -137,5 +137,48 @@ open eq prod unit bool sum sigma ua funext nat lift
  definition qinv_to_ishae (f : A → B) :
      qinv f → ishae f :=
  λ e, sigma.rec_on e (λ g w, prod.rec_on w (λ ε η, ⟨g, ⟨ (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) , ⟨η, tau_qinv f g ε η ⟩⟩⟩ ))
+
+ -- The type ishae is a mere proposition
+
+ -- Definition 4.2.4 (Fiber of a map)
+
+ definition fib (f : A → B) (y : B) : Type :=
+   Σ (x : A), f x = y
+
+ -- Lemma 4.2.5
+
+ -- Preservation of equivalence by equality and equivalence of inverse paths
+
+ definition eq_preserves_equiv {x y : A} (p q r : x = y) (α : p = q) : 
+     (p = r) ≃ (q = r) :=
+ by induction α; apply typeq_refl
+
+ definition inv_is_equiv (x y : A) :  
+     (x = y) ≃ (y = x) :=
+ ⟨(λ p, p⁻¹), ( ⟨(λ p, p⁻¹), λ p, eq.rec idp p ⟩, ⟨(λ p, p⁻¹), λ p, eq.rec idp p ⟩)⟩
+
+ -- This version of lu makes explicit our use of path_conc
+
+ definition lu' {x y : A} (p : x = y) :     
+     p = path_conc (refl x) p :=
+ eq.rec_on p (refl (refl x)) 
+
+-- Lemma 4.2.5
+
+ definition fib_equiv (f : A → B) (y : B) (h h' : fib f y) :
+     h = h' ≃ Σ (γ : pr1 h = pr1 h'), ap f γ ⬝ pr2 h' = pr2 h :=
+ have H : Π γ, transport (λ (x : A), f x = y) (γ : pr1 h = pr1 h') (pr2 h) = pr2 h'  ≃  ap f γ⁻¹ ⬝ pr2 h = pr2 h', from
+  begin
+   intro γ, cases h with a b, cases h' with a' b', esimp at *,
+   induction γ, induction b, apply typeq_refl
+  end,
+ have aps_eq : Π γ, (ap f γ⁻¹ ⬝ pr2 h = pr2 h') ≃ (ap f γ ⬝ pr2 h' = pr2 h), from
+ begin
+  intro γ, cases h with a b, cases h' with a' b', esimp at *,
+  induction γ, induction b, unfold path_inv, esimp at *,
+  apply (inv_is_equiv (refl (f a)) b' ∘
+    eq_preserves_equiv b' (refl (f a) ⬝ b') (refl (f a)) (lu' b') )
+ end,
+ (sigma_equiv ∘ (sigma_preserves_equiv H)) ∘ sigma_preserves_equiv aps_eq
  
  --
