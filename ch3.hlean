@@ -239,7 +239,7 @@ definition universe_not_set :
 
  -- Lemma 3.5.1
 
- definition prop_sigma_eq (P : A → Type) (H : Π (x : A), isProp(P(x))) (u v : Σ (x : A), P x) :
+ definition prop_sigma_eq {P : A → Type} (H : Π (x : A), isProp(P(x))) (u v : Σ (x : A), P x) :
      (pr1 u = pr1 v) → u = v :=
  λ p, sigma_eq ⟨p, begin cases u with u1 u2, cases v with v1 v2, esimp at *, induction p, apply ((H u1) u2 v2) end ⟩
  
