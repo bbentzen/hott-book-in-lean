@@ -181,24 +181,20 @@ open eq prod unit bool sum sigma ua funext nat lift
  end,
  (sigma_equiv ∘ (sigma_preserves_equiv H)) ∘ sigma_preserves_equiv aps_eq
  
-  -- Theorem 4.2.6
-
-/-
+ -- Theorem 4.2.6
 
  definition fib_contr (f : A → B) (y : B) (h : ishae f) :
      isContr (fib f y) :=
  begin
-  cases h with g h, cases h with ε h, cases h with η τ, apply ⟨⟨ g y, ε y ⟩,
+  cases h with g h, cases h with ε h, cases h with η τ, apply ⟨(⟨ g y, ε y ⟩ : fib f y),
   show Π (w : fib f y), ⟨g y, ε y⟩ = w, from
     begin
       intro x, cases x with x p,
-      apply (transport (λ x, x) (ua (fib_equiv f y ⟨g y, ε y⟩ ⟨x,p⟩))⁻¹ 
-      ⟨ (ap g p)⁻¹ ⬝ (η x),
-       begin
-        induction p, esimp at *, apply ((ap (ap f) (lu' ((η x))))⁻¹ ⬝ τ x)
-       end⟩)
+      apply (transport (λ x, x) (ua (fib_equiv f y ⟨g y, ε y⟩ ⟨x,p⟩))⁻¹ -- transport along lemma 4.2.5:
+      ⟨ (ap g p)⁻¹ ⬝ (η x),  -- : g y = x
+       by induction p;
+       apply ((ap (ap f) (lu' ((η x))))⁻¹ ⬝ τ x) ⟩) -- : ap f ((ap g p)⁻¹ ⬝ (η x)) ⬝ p = ε (f x)
     end⟩ 
  end
- -/
  
  --
