@@ -196,5 +196,31 @@ open eq prod unit bool sum sigma ua funext nat lift
        apply ((ap (ap f) (lu' ((η x))))⁻¹ ⬝ τ x) ⟩) -- : ap f ((ap g p)⁻¹ ⬝ (η x)) ⬝ p = ε (f x)
     end⟩ 
  end
- 
+
+ -- Definition 4.2.7 (Left and right inverses)
+
+ definition linv (f : A → B) : Type :=
+     Σ (g : B → A), g ∘ f ~ id A
+
+ definition rinv (f : A → B) : Type :=
+     Σ (g : B → A), f ∘ g ~ id B
+
+ -- Lemma 4.2.8 
+
+ definition comp_qinv_left (f : A → B) (e : qinv f) :
+     qinv (λ (h : C → A), f ∘ h) :=
+ sigma.rec_on e (λ g e, prod.rec_on e (λ η ε,
+ ⟨(λ (h : C → B), g ∘ h),
+  (begin intro h, apply funext, intro x, apply (η (h x)) end, 
+   begin intro h, apply funext, intro y, apply (ε (h y)) end ) ⟩ ) )
+
+ definition comp_qinv_right (f : A → B) (e : qinv f) :
+     qinv (λ (h : B → C), h ∘ f) :=
+ sigma.rec_on e (λ g e, prod.rec_on e (λ η ε,
+ ⟨(λ (h : A → C), h ∘ g),
+  (begin intro h,
+    apply ((comp_assoc f g h)⁻¹ ⬝ funext (h ~ₗ ε)) end, 
+   begin intro h,
+    apply ((comp_assoc g f h)⁻¹ ⬝ funext (h ~ₗ η)) end ) ⟩ ) )
+
  --
