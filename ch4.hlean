@@ -223,4 +223,15 @@ open eq prod unit bool sum sigma ua funext nat lift
    begin intro h,
     apply ((comp_assoc g f h)⁻¹ ⬝ funext (h ~ₗ η)) end ) ⟩ ) )
 
+ -- Lemma 4.2.9
+
+ definition linv_contr {A B : Type.{i}} (f : A → B) (e : qinv f) :
+     isContr (linv f) :=
+ have linveq : (Σ (g : B → A), g ∘ f = id A)  ≃  Σ (g : B → A), g ∘ f ~ id A, from
+   sigma_preserves_equiv (λ g, ⟨happly, fun_extensionality⟩),
+ have fib_linv : fib (λ (h : B → A), h ∘ f) (id A) = linv f, from
+   transport (λ x, _ = x) (ua linveq) idp,
+ transport isContr fib_linv (fib_contr (λ (h : B → A), h ∘ f) (id A)
+  (qinv_to_ishae _ (comp_qinv_right f e)))
+
  --
