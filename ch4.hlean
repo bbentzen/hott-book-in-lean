@@ -291,8 +291,12 @@ open eq prod unit bool sum sigma ua funext nat lift
      isContr (Σ (a : A), P a) :=
  sorry
 
- definition ishae_is_contr {A B : Type.{i}} (f : A → B) (e : ishae f) :
+ definition ishae_e_contr {A B : Type.{i}} (f : A → B) (e : ishae f) :
      isContr (ishae f) :=
  transport isContr (ua (ishae_equiv_rcoh f))⁻¹ (sigma_preserves_contr (λ u, rcoh_contr f e u))
+ 
+ definition ishae_is_prop {A B : Type.{i}} (f : A → B) :
+     isProp (ishae f) :=
+ transport (λ x, x) (ua prop_eq_contr)⁻¹ (ishae_e_contr f)
 
  --
