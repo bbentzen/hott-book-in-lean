@@ -21,7 +21,7 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- Lemma 4.1.1 
 
- -- Useful lemmas of preservation of equality by type formers
+ -- Useful lemmas of preservation of equivalence by type formers
 
  definition prod_preserves_equiv {A B : Type.{i}} {A' B' : Type.{j}} (e₁ : A ≃ B) (e₂ : A' ≃ B') :
      A × A' ≃  B × B' :=
@@ -233,5 +233,38 @@ open eq prod unit bool sum sigma ua funext nat lift
    transport (λ x, _ = x) (ua linveq) idp,
  transport isContr fib_linv (fib_contr (λ (h : B → A), h ∘ f) (id A)
   (qinv_to_ishae _ (comp_qinv_right f e)))
+
+ -- Definition 4.2.10
+
+ definition lcoh (f : A → B) (l : linv f) : Type :=
+     Σ (ε : f ∘ (pr1 l) ~ id B), Π (y : B), (pr2 l) ((pr1 l) y) = ap (pr1 l) (ε y)
+
+ definition rcoh (f : A → B) (r : rinv f) : Type :=
+     Σ (η : (pr1 r) ∘ f ~ id A), Π (x : A), (pr2 r) (f x) = ap f (η x)
+
+ -- Lemma 4.2.11
+
+ -- Preservation of equivalence by Pi type
+
+ definition pi_preserves_equiv {X : Type} {A B : X → Type.{i}} (H : Π (x : X), A x ≃ B x ) :
+     (Π (x : X), A x)  ≃  Π (x : X), B x :=
+ ⟨ (λ f x, (pr1 (H x)) (f x)) ,
+  (⟨ (λ g x, (pr1 (pr1 (pr2 (H x)))) (g x)) ,
+    begin
+     intro h, apply funext, intro x,
+     apply (pr2 (pr1 (pr2 (H x))) (h x)) -- η (h x)
+    end⟩ ,
+   ⟨ (λ g x, (pr1 (pr2 (pr2 (H x)))) (g x)) , 
+    begin
+     intro w, apply funext, intro x,
+     apply (pr2 (pr2 (pr2 (H x))) (w x)) -- ε (w x)
+    end 
+ ⟩) ⟩ 
+
+ definition lem4211r (f : A → B) (r : rinv f) :
+    rcoh f r ≃ Π (x : A), ⟨(pr1 r) (f x), (pr2 r) (f x)⟩ = ⟨ x, refl (f x)⟩ :=
+ (@dupsig_eq A (λ a, (pr1 r) (f a) = id A a) (λ x η, (pr2 r) (f x) = ap f ((λ x, η) x) ))⁻¹ ∘ -- pi and sigma commutes (ac)
+ pi_preserves_equiv (λ x, sigma_preserves_equiv (λ η, inv_is_equiv _ _) ∘ 
+ (fib_equiv f _ ⟨(pr1 r) (f x), (pr2 r) (f x)⟩  ⟨ x, refl (f x)⟩)⁻¹) -- lemma 4.2.5
 
  --
