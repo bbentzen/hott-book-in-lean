@@ -261,10 +261,10 @@ open eq prod unit bool sum sigma ua funext nat lift
     end 
  ⟩) ⟩ 
 
- definition lem4211r (f : A → B) (r : rinv f) :
+ definition rcoh_equiv (f : A → B) (r : rinv f) :
     rcoh f r ≃ Π (x : A), ⟨(pr1 r) (f x), (pr2 r) (f x)⟩ = ⟨ x, refl (f x)⟩ :=
- (@dupsig_eq A (λ a, (pr1 r) (f a) = id A a) (λ x η, (pr2 r) (f x) = ap f ((λ x, η) x) ))⁻¹ ∘ -- pi and sigma commutes (ac)
- pi_preserves_equiv (λ x, sigma_preserves_equiv (λ η, inv_is_equiv _ _) ∘ 
+ (@dupsig_eq A (λ a, (pr1 r) (f a) = id A a) (λ x η, (pr2 r) (f x) = ap f ((λ x, η) x) ))⁻¹ ∘ -- Π and Σ commutes (Thm 2.15.7 / ac)
+ pi_preserves_equiv (λ x, sigma_preserves_equiv (λ η, inv_is_equiv _ _) ∘ -- preservation of equiv by Π, Σ, and inverse path
  (fib_equiv f _ ⟨(pr1 r) (f x), (pr2 r) (f x)⟩  ⟨ x, refl (f x)⟩)⁻¹) -- lemma 4.2.5
 
  --
