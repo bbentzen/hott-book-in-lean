@@ -267,4 +267,32 @@ open eq prod unit bool sum sigma ua funext nat lift
  pi_preserves_equiv (λ x, sigma_preserves_equiv (λ η, inv_is_equiv _ _) ∘ -- preservation of equiv by Π, Σ, and inverse path
  (fib_equiv f _ ⟨(pr1 r) (f x), (pr2 r) (f x)⟩  ⟨ x, refl (f x)⟩)⁻¹) -- lemma 4.2.5
 
+ -- Lemma 4.2.12
+
+ definition contr_path_space (x y : A) (c : isContr A) :
+     isContr (x = y) :=
+ ⟨ (pr2 c x)⁻¹ ⬝ (pr2 c y) ,  λ p, eq.rec_on p (left_inv (pr2 c x)) ⟩ 
+
+ definition rcoh_contr {A B : Type.{i}} (f : A → B) (e : ishae f) (r : rinv f) :
+     isContr (rcoh f r) :=
+ transport isContr (ua (rcoh_equiv f r))⁻¹ (pi_preserves_contr 
+ (show Π (x : A), isContr (⟨(pr1 r) (f x), (pr2 r) (f x)⟩ = ⟨ x, refl (f x)⟩), from
+   λ x, contr_path_space _ _ (fib_contr f (f x) e)))
+
+ -- Theorem 4.2.13 (ishae is a mere proposition)
+
+ definition ishae_equiv_rcoh {A B : Type.{i}} (f : A → B) :
+     ishae f ≃ Σ (ε : rinv f), rcoh f ε :=
+ sigma_preserves_equiv (λ g, sigma_preserves_equiv (λ ε, sigma_preserves_equiv (λ η,
+ pi_preserves_equiv (λ x, inv_is_equiv (ap f (η x)) (ε (f x))) ))) ∘ 
+ sigma_assoc _ (λ (u : rinv f), rcoh f u)
+
+ definition sigma_preserves_contr {P : A → Type} (c : Π (a : A), isContr (P a)) :
+     isContr (Σ (a : A), P a) :=
+ sorry
+
+ definition ishae_is_contr {A B : Type.{i}} (f : A → B) (e : ishae f) :
+     isContr (ishae f) :=
+ transport isContr (ua (ishae_equiv_rcoh f))⁻¹ (sigma_preserves_contr (λ u, rcoh_contr f e u))
+
  --
