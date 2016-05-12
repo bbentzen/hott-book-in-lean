@@ -348,4 +348,22 @@ open eq prod unit bool sum sigma ua funext nat lift
  (qinv_to_ishae f ∘ isequiv_to_qinv f)
  (qinv_to_isequiv f ∘ ishae_to_qinv f)
 
+ /- §4.4 (Contractible maps)  -/ 
+
+ -- Definition 4.4.1
+
+ definition isContrMap (f : A → B) : Type :=
+     Π (y : B), isContr (fib f y)
+
+ -- Theorem 4.4.3
+
+ definition contrmap_to_ishae {A B : Type.{i}} (f : A → B) :
+     isContrMap f → ishae f :=
+ λ P, let g := λ y, pr1 (pr1 (P y)) in let ε := λ y, pr2 (pr1 (P y)) in
+ have ητ : rcoh f ⟨g,ε⟩, from
+  transport (λ x, x) (ua (rcoh_equiv f ⟨g,ε⟩)⁻¹)
+   (λ x, ((pr2 (P (f x))) (⟨ g (f x), ε (f x)⟩ : fib f (f x)))⁻¹ 
+   ⬝ (pr2 (P (f x))) (⟨ x, refl (f x)⟩ : fib f (f x))),
+ transport (λx,x) (ua(ishae_equiv_rcoh f))⁻¹ ⟨⟨g,ε⟩,ητ⟩
+
  --
