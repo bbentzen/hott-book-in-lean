@@ -317,3 +317,35 @@ open eq prod unit bool sum sigma ua funext nat lift
  transport (λ x, x) (ua prop_eq_contr)⁻¹ ishae_contr
 
  --
+
+ /- §4.3 (Bi-invertible maps)  -/
+
+ -- Definition 4.3.2  (biinv := isequiv)
+
+ definition biinv (f : A → B) : Type :=
+    rinv f × linv f
+
+ -- Products preserve contractible types
+
+ definition prod_preserves_contr (H₁ : isContr A) (H₂ : isContr B) : 
+     isContr (A × B) :=
+ sigma.rec_on H₁ (λ a p, sigma.rec_on H₂ (λ b q,
+  ⟨(a,b), λ x, prod.rec_on x (λ a' b', pair_eq (p a',q b')) ⟩))
+
+ -- Theorem 4.3.2
+
+ definition biinv_is_prop {A B : Type.{i}} (f : A → B) :
+     isProp (biinv f) :=
+ have biinv_contr : biinv f → isContr (biinv f), from
+  λ e, prod_preserves_contr (rinv_contr f (isequiv_to_qinv f e)) (linv_contr f (isequiv_to_qinv f e)),
+ transport (λ x, x) (ua prop_eq_contr)⁻¹ biinv_contr
+
+ -- Corollary 4.3.3
+
+ definition biinv_eq_ishae {A B : Type.{i}} (f : A → B) :
+     biinv f ≃ ishae f :=
+ prop_eqv (biinv_is_prop f) (ishae_is_prop f)
+ (qinv_to_ishae f ∘ isequiv_to_qinv f)
+ (qinv_to_isequiv f ∘ ishae_to_qinv f)
+
+ --
