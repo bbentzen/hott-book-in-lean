@@ -238,6 +238,15 @@ open eq prod unit bool sum sigma ua funext nat lift
  transport isContr fib_linv (fib_contr (λ (h : B → A), h ∘ f) (id A)
   (qinv_to_ishae _ (comp_qinv_right f e)))
 
+ definition rinv_contr {A B : Type.{i}} (f : A → B) (e : qinv f) :
+     isContr (rinv f) :=
+ have rinveq : (Σ (g : B → A), f ∘ g = id B)  ≃  Σ (g : B → A), f ∘ g ~ id B, from
+   sigma_preserves_equiv (λ g, ⟨happly, fun_extensionality⟩),
+ have fib_rinv : fib (λ (h : B → A), f ∘ h) (id B) = rinv f, from
+   transport (λ x, _ = x) (ua rinveq) idp,
+ transport isContr fib_rinv (fib_contr (λ (h : B → A), f ∘ h) (id B)
+  (qinv_to_ishae _ (comp_qinv_left f e)))
+
  -- Definition 4.2.10
 
  definition lcoh (f : A → B) (l : linv f) : Type :=
