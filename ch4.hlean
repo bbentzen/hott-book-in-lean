@@ -291,14 +291,20 @@ open eq prod unit bool sum sigma ua funext nat lift
  pi_preserves_equiv (λ x, inv_is_equiv (ap f (η x)) (ε (f x))) ))) ∘ 
  sigma_assoc _ (λ (u : rinv f), rcoh f u)
 
- definition sigma_preserves_contr {P : A → Type} (c : Π (a : A), isContr (P a)) :
+  definition sigma_preserves_contr {P : A → Type} (a : A) (H : isProp A) (c : Π (a : A), isContr (P a)) :
      isContr (Σ (a : A), P a) :=
- sorry
+ (pr2 (@contr_iff_pprop (Σ (a : A), P a))) ⟨⟨a, pr1 (c a)⟩,
+ sigma_preserves_prop H (λ a, pr2 ((pr1 (@contr_iff_pprop (P a))) (c a))) ⟩ 
 
  definition ishae_is_prop {A B : Type.{i}} (f : A → B) :
      isProp (ishae f) :=
- have ishae_contr : ishae f → isContr (ishae f), from
-   λ e, transport isContr (ua (ishae_equiv_rcoh f))⁻¹ (sigma_preserves_contr (λ u, rcoh_contr f e u)),
+ have ishae_contr : ishae f → isContr (ishae f), 
+  from λ e, 
+   have r : rinv f,
+    from ⟨pr1 e, pr1(pr2 e)⟩,
+   have p : isProp (rinv f),
+    from pr2 (pr1 (@contr_iff_pprop (rinv f)) (rinv_contr f ((ishae_to_qinv f) e))),
+   transport isContr (ua (ishae_equiv_rcoh f))⁻¹ (sigma_preserves_contr r p (λ u, rcoh_contr f e u)),
  transport (λ x, x) (ua prop_eq_contr)⁻¹ ishae_contr
 
  --
