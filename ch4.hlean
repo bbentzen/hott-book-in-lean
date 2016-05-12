@@ -138,6 +138,10 @@ open eq prod unit bool sum sigma ua funext nat lift
      qinv f → ishae f :=
  λ e, sigma.rec_on e (λ g w, prod.rec_on w (λ ε η, ⟨g, ⟨ (λ b, (ε (f (g b)))⁻¹ ⬝ ap f (η (g b)) ⬝ ε b) , ⟨η, tau_qinv f g ε η ⟩⟩⟩ ))
 
+ definition ishae_to_qinv (f : A → B) :
+     ishae f → qinv f :=
+ by intro e; cases e with g e; cases e with ε e; cases e with η τ; apply ⟨g,(ε,η)⟩
+
  -- The type ishae is a mere proposition
 
  -- Definition 4.2.4 (Fiber of a map)
