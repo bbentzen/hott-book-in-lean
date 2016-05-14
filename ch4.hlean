@@ -342,11 +342,20 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- Corollary 4.3.3
 
+ definition biinv_to_ishae (f : A → B) :
+     biinv f → ishae f :=
+ qinv_to_ishae f ∘ isequiv_to_qinv f
+
+ definition ishae_to_biinv (f : A → B) :
+     ishae f → biinv f :=
+ qinv_to_isequiv f ∘ ishae_to_qinv f
+
  definition biinv_eq_ishae {A B : Type.{i}} (f : A → B) :
      biinv f ≃ ishae f :=
  prop_eqv (biinv_is_prop f) (ishae_is_prop f)
- (qinv_to_ishae f ∘ isequiv_to_qinv f)
- (qinv_to_isequiv f ∘ ishae_to_qinv f)
+ (biinv_to_ishae f) (ishae_to_biinv f)
+
+ --
 
  /- §4.4 (Contractible maps)  -/ 
 
@@ -365,5 +374,62 @@ open eq prod unit bool sum sigma ua funext nat lift
    (λ x, ((pr2 (P (f x))) (⟨ g (f x), ε (f x)⟩ : fib f (f x)))⁻¹ 
    ⬝ (pr2 (P (f x))) (⟨ x, refl (f x)⟩ : fib f (f x))),
  transport (λx,x) (ua(ishae_equiv_rcoh f))⁻¹ ⟨⟨g,ε⟩,ητ⟩
+
+ -- Lemma 4.4.4 (isContrMap is a mere proposition)
+
+ definition contrmap_is_prop {A B : Type.{i}} (f : A → B) :
+     isProp (isContrMap f) :=
+  pi_preserves_prop (λ y, isContr_is_prop (fib f y))
+
+ -- Theorem 4.4.5
+
+ definition contrmap_eq_ishae {A B : Type.{i}} (f : A → B) :
+     isContrMap f ≃ ishae f :=
+ prop_eqv (contrmap_is_prop f) (ishae_is_prop f)
+ (contrmap_to_ishae f) (λ h, (λ y, fib_contr f y h))
+
+ -- Corollary 4.4.6
+
+ definition cod_inhab_eq {A B : Type.{i}} (f : A → B) (H : B → ishae f) :
+     ishae f :=
+ transport (λx,x) (ua(contrmap_eq_ishae f)) (λ y, (transport (λx,x) (ua(contrmap_eq_ishae f)⁻¹) (H y)) y)
+
+ definition contrmap_to_isequiv {A B : Type.{i}} (f : A → B) :
+     isContrMap f → isequiv f :=
+ λ c, ishae_to_biinv f (contrmap_to_ishae f c)
+
+ --
+
+ /- §4.5 (On the definition of equivalences)  -/ 
+
+ --
+
+ -- No formalizable content.
+
+ --
+
+ /- §4.6 (Surjections and embeddings)  -/ 
+
+ -- Definition 4.6.1
+
+ definition isSurjective (f : A → B) : Type :=
+     Π (y : B), ║fib f y║
+
+ definition isEmbedding (f : A → B) (x y : A) : Type :=
+     ishae (@ap A B f x y)
+
+ -- Theorem 4.6.3
+
+ definition equiv_to_surj_emb (f : A → B) {x y : A} :
+    isequiv f → (isSurjective f × isEmbedding f x y) :=
+ λ e, (λ y, |pr1 (fib_contr f y (biinv_to_ishae f e))|, biinv_to_ishae _ (id_eq f e))
+
+ definition surj_emb_to_equiv {A B : Type.{i}} (f : A → B)  :
+    (isSurjective f × Π (x y : A), isEmbedding f x y) → isequiv f :=
+ λ w, prod.rec_on w (λ s e, contrmap_to_isequiv f (λ b,
+ pr2 (contr_iff_pprop (fib f b)) ⟨truncation.rec_on (s b) (λ a, a), 
+  λ w1 w2, sigma.rec_on w1 (λ x p, sigma.rec_on w2 (λ y q,
+    sigma_eq ⟨(pr1 (e x y)) (p ⬝ q⁻¹), sorry ⟩ ))
+  ⟩ ) )
 
  --
