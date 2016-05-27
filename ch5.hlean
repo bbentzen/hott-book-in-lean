@@ -17,7 +17,7 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  variables {A B C X Z: Type} 
 
- -- Theorem 5.1. 
+ -- Theorem 5.1.1
  
  definition uniq_nat_rec {E : ℕ → Type} (f g : Π (x : ℕ), E x) (e₀ : E 0) (eₛ : Π (x : ℕ), E x → E (succ x))
   (H₁ : f 0 = e₀) (H₂ : g 0 = e₀) (H₃ : Π n, f (succ n) = eₛ n (f n)) (H₄ : Π n, g (succ n) = eₛ n (g n)) :
@@ -81,12 +81,27 @@ open eq prod unit bool sum sigma ua funext nat lift
 
  -- List with W-types
 
- definition list' (A : Type) : Type₀ := W (b : 𝟮), bool.rec_on b 𝟬 𝟮
+ definition list' (A : Type₀) : Type₀ := W (a : 𝟭 + A), sum.rec_on a (λ u, 𝟬) (λ a, 𝟭)
 
- definition nil' : list' A :=
-   sup ff (λ (x : 𝟬), empty.rec_on _ x)
+ definition nil' {A : Type₀} : list' A :=
+   sup (inl(⋆)) (λ (x : 𝟬), empty.rec_on _ x)
 
--- definition cons' : A → list' A → list' A := 
---  λ a u, sup tt (λ (x : 𝟭), u)
+ definition cons' {A : Type₀} : A → list' A → list' A := 
+  λ a u, sup (inr(a)) (λ (x : 𝟭), u)
 
+ -- Definition of double
+
+ definition double' : ℕ' → ℕ' :=
+ begin
+  intro n, induction n with b u IH,
+  induction b, apply zero', apply (succ' (succ' (IH ⋆)))
+ end
+
+ -- Theorem 5.3.1. 
+ 
+ definition uniq_w_rec {B : A → Type} {E : (W (a : A), B a) → Type} (g h : Π (w : W (a : A), B a), E w) (e : Π (a : A) (f : B a → W (a : A), B a), (Π (b : B a), E (f b)) → E (sup a f)) (H₁ : Π (a : A) (f : B a → W (a : A), B a), g (sup a f) = e a f (λ b, g (f b)) )
+  (H₂ : Π (a : A) (f : B a → W (a : A), B a), h (sup a f) = e a f (λ b, h (f b)) ) :
+     g = h :=
+ sorry
+ 
  --
