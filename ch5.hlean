@@ -102,6 +102,21 @@ open eq prod unit bool sum sigma ua funext nat lift
  definition uniq_w_rec {B : A → Type} {E : (W (a : A), B a) → Type} (g h : Π (w : W (a : A), B a), E w) (e : Π (a : A) (f : B a → W (a : A), B a), (Π (b : B a), E (f b)) → E (sup a f)) (H₁ : Π (a : A) (f : B a → W (a : A), B a), g (sup a f) = e a f (λ b, g (f b)) )
   (H₂ : Π (a : A) (f : B a → W (a : A), B a), h (sup a f) = e a f (λ b, h (f b)) ) :
      g = h :=
- sorry
+  definition uniq_w_rec {B : A → Type} {E : (W (a : A), B a) → Type} (g h : Π (w : W (a : A), B a), E w) 
+  (e : Π (a : A) (f : B a → W (a : A), B a), (Π (b : B a), E (f b)) → E (sup a f) ) 
+  (H₁ : Π (a : A) (f : B a → W (a : A), B a), g (sup a f) = e a f (λ b, g (f b)) )
+  (H₂ : Π (a : A) (f : B a → W (a : A), B a), h (sup a f) = e a f (λ b, h (f b)) ) :
+     g = h :=
+ begin
+   apply funext, intro w, induction w with a f IH,
+   apply (H₁ a f ⬝ 
+     begin
+      apply (ap (e a f) (show (λ b, g (f b)) = (λ b, h (f b)), from
+        begin
+         apply funext, apply IH 
+        end)) 
+      end 
+    ⬝  (H₂ a f)⁻¹)
+ end
  
  --
