@@ -58,7 +58,7 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
       apd (λ x, rec_on x b l) loop = l :=
  apd_rec_eq_loop b l
 
- -- Lemma 6.2.5 (non-dependent recursor)
+ -- Lemma 6.2.5 (Non-dependent recursor)
 
  definition ndrec (a : A) (p : a = a) (x : S¹) : A :=
   @circle.rec_on (λ x, A) x a (concat (trans_const loop a) p)
@@ -69,3 +69,14 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
    (apd_eq_trans_const_ap (λ x, A) (ndrec a p) loop)⁻¹ ⬝
    (@apd_rec_on_eq_loop (λ x, A) a (trans_const loop a ⬝ p)),
  unwhisker_left (trans_const loop a) H
+
+ -- Lemma 6.2.8 (Uniqueness principle)
+ 
+ definition uniq (f g : S¹ → A) (p : f base = g base) (q : ap f loop =⟨p⟩ ap g loop) :
+     Π (x : S¹), f x = g x :=
+ λ x, rec_on x p (id_trans_fun f g loop p -- thm 2.11.3
+  ⬝ ( (conc_assoc _ _ _)⁻¹ ⬝  (( (ap f loop)⁻¹ ⬝ₗ -- associativity
+ (pr1 (id_trans_equiv p (ap f loop) (ap g loop)) q)⁻¹) ⬝ -- thm 2.11.5
+  conc_assoc _ _ _ ⬝ (left_inv (ap f loop) ⬝ᵣ p) ⬝ (lu p)⁻¹)) ) -- cancellation (ap f loop)⁻¹
+
+ --
