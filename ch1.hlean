@@ -148,10 +148,27 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
  --
 
- /-- Other useful lemmas --/
+  /-- Other useful lemmas --/
 
-  definition id (A : Type) : A → A := λ (x : A), x
+ definition id (A : Type) : A → A := λ (x : A), x
 
-  definition ant (m : ℕ) : ℕ :=
-   nat.rec 0 (λ m ant_m, ant_m) m
+ definition ant [reducible] (m : ℕ) : ℕ :=
+   nat.rec 0 (λ m ant_m, m) m
 
+ -- Interplay between transport and pathovers (used in ch 6)
+
+ universe variables l i
+
+ definition cancel_tr_pathover {A : Type.{l}} {x y : A} {P : A → Type.{i}} {p : x = y} {u : P x} {v : P y} (α : transport P p u = v) :
+    tr_eq_of_pathover.{l i} (pathover_of_tr_eq α) = α :=
+ by cases p; cases α; apply idp
+
+ definition apdo_to_apd {P : A → Type} {x y : A} (f : Π (x : A), P x) (p : x = y) :
+     tr_eq_of_pathover (apdo f p) = apd f p :=
+ by induction p; unfold apdo
+
+ --
+
+notation a `=⟨`:50 p:0 `⟩`:0 b:50 := (transport _ p a) = b
+
+ --
