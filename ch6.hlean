@@ -118,13 +118,29 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
 
  namespace interval
 
-  definition I : Type₀ := quotient (λ (x y : 𝟮), 𝟭)
+  definition I : Type₀ := quotient (λ (x y : 𝟮), x=ff × y=tt)  
 
-  definition zero : I := class_of (λ (x y : 𝟮), 𝟭) ff
+  definition zero : I := class_of (λ (x y : 𝟮), x=ff × y=tt) ff
 
-  definition one : I := class_of (λ (x y : 𝟮), 𝟭) tt
+  definition one : I := class_of (λ (x y : 𝟮), x=ff × y=tt) tt
 
-  definition seg : zero = one := eq_of_rel (λ (x y : 𝟮), 𝟭) ⋆ 
+  definition seg : zero = one := eq_of_rel (λ (x y : 𝟮), x=ff × y=tt) (idp,idp)
+
+ -- Induction principle
+
+  definition rec {P : I → Type.{i}} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) (x : I) : P x :=
+   @quotient.rec 𝟮 (λ (x y : 𝟮), x=ff × y=tt) P (λ (a : 𝟮), bool.rec_on a b₀ b₁)
+   (λ a a', (bool.rec_on a  (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
+    (λ H, prod.rec_on H (λ H₁ H₂, change_path ((λ p q, eq.rec (eq.rec idp q) p) 
+     (bool_is_set ff ff idp H₁) (bool_is_set tt tt idp H₂)) (pathover_of_tr_eq s) )  )) 
+    (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
+    (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₁⁻¹)))) ) ) x
+
+ -- Lemma 6.3.1 (Interval is contractible)
+
+  definition is_contr :
+      isContr I :=
+  ⟨ zero , sorry⟩
 
  end interval
  
