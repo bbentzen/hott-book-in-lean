@@ -165,6 +165,23 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
    esimp at *, apply transport, exact (ua (pathover_pathover_path ((eq.rec (eq.rec idp (bool_is_set tt tt idp idp)) (bool_is_set ff ff idp idp))) (pathover_of_tr_eq s) (pathover_of_tr_eq s))), exact (testelem2 b₀ b₁ s)
  end
 
+  definition adpo_rec_seg {P : I → Type.{i}} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
+     apdo (λ x, rec b₀ b₁ s x) seg = (pathover_of_tr_eq s) :=
+ (@quotient.rec_eq_of_rel 𝟮 (λ (x y : 𝟮), x=ff × y=tt) P (λ (a : 𝟮), bool.rec_on a b₀ b₁)
+  (λ a a', (bool.rec_on a  (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
+    (λ H, prod.rec_on H (λ H₁ H₂, change_path ((λ p q, eq.rec (eq.rec (refl seg) q) p) 
+     (bool_is_set ff ff (refl ff) H₁) (bool_is_set tt tt (refl tt) H₂)) (pathover_of_tr_eq s) )  )) 
+    (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
+    (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₁⁻¹)))) ) ) ff tt (refl ff,refl tt)) ⬝  -- concat
+  (show _ = pathover_of_tr_eq s, from
+     (transport _ (ua (pathover_pathover_path _ _ _) )
+    ((λ H₁ H₂, (change_path (transport _
+       (show refl seg = (eq.rec (refl seg) (bool_is_set tt tt (refl tt) (refl tt))), from 
+          eq.rec_on H₁ idp) 
+        (transport _ H₂ idp) )))
+      (set_is_1_type bool_is_set tt tt (refl tt) (refl tt) (refl (refl tt)) (bool_is_set tt tt (refl tt) (refl tt))) -- H₁
+      (set_is_1_type bool_is_set ff ff (refl ff) (refl ff) (refl (refl ff)) (bool_is_set ff ff (refl ff) (refl ff))) -- H₂
+  (@pathover.idpatho (zero = one) seg (λ (a : zero = one), pathover P b₀ a b₁) (pathover_of_tr_eq s)) )) )
 
 
  -- Lemma 6.3.1 (Interval is contractible)
