@@ -136,6 +136,37 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
     (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
     (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₁⁻¹)))) ) ) x
 
+ -- Some lemmas (will be organized later)
+ 
+  definition reflseg1 (H₁ : (refl (refl tt)) = (bool_is_set tt tt (refl tt) (refl tt))) :
+     (refl seg) = (eq.rec (refl seg) (bool_is_set tt tt (refl tt) (refl tt))) :=
+ transport _ H₁ idp
+
+ definition lemma234 (H₁ : (refl (refl tt)) = (bool_is_set tt tt (refl tt) (refl tt)))
+   (H₂ : (refl (refl ff)) = (bool_is_set ff ff (refl ff) (refl ff))) :
+     refl seg = eq.rec (eq.rec (refl seg) (bool_is_set tt tt (refl tt) (refl tt))) (bool_is_set ff ff (refl ff) (refl ff)) :=
+ transport _ (reflseg1 H₁) (transport _ H₂ idp)
+
+  definition testelem2 {P : I → Type.{i}} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
+     pathover (λ (a : eq zero one), pathover P b₀ a b₁) (pathover_of_tr_eq s)
+    (eq.rec (eq.rec idp (bool_is_set tt tt (refl tt) (refl tt))) (bool_is_set ff ff (refl ff) (refl ff))) (pathover_of_tr_eq s) :=
+ (change_path (lemma234 
+    (set_is_1_type bool_is_set tt tt (refl tt) (refl tt) (refl (refl tt)) (bool_is_set tt tt (refl tt) (refl tt)))
+    (set_is_1_type bool_is_set ff ff (refl ff) (refl ff) (refl (refl ff)) (bool_is_set ff ff (refl ff) (refl ff)))) 
+  (@pathover.idpatho (zero = one) seg (λ (a : eq zero one), pathover P b₀ a b₁) (pathover_of_tr_eq s)) )
+
+ definition teste {P : I → Type.{i}} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
+     (λ a a', (bool.rec_on a  (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
+    (λ H, prod.rec_on H (λ H₁ H₂, change_path ((λ p q, eq.rec (eq.rec (refl seg) q) p) 
+     (bool_is_set ff ff (refl ff) H₁) (bool_is_set tt tt (refl tt) H₂)) (pathover_of_tr_eq s) )  )) 
+    (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
+    (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₁⁻¹)))) ) ) ff tt (refl ff,refl tt) = pathover_of_tr_eq s :=
+ begin
+   esimp at *, apply transport, exact (ua (pathover_pathover_path ((eq.rec (eq.rec idp (bool_is_set tt tt idp idp)) (bool_is_set ff ff idp idp))) (pathover_of_tr_eq s) (pathover_of_tr_eq s))), exact (testelem2 b₀ b₁ s)
+ end
+
+
+
  -- Lemma 6.3.1 (Interval is contractible)
 
   definition is_contr :
