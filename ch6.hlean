@@ -159,11 +159,18 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
   (apdo_to_apd (λ x, rec b₀ b₁ s x) seg)⁻¹ ⬝ ap tr_eq_of_pathover (adpo_rec_eq_seg b₀ b₁ s) ⬝
   (@cancel_tr_pathover I zero one P seg b₀ b₁ s)
 
- -- Lemma 6.3.1 (Interval is contractible)
+  definition rec_on {P : I → Type.{i}} (x : I) (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) : P x :=
+  rec b₀ b₁ s x
+
+  definition apd_rec_on_eq_loop {P : I → Type} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
+      apd (λ x, rec_on x b₀ b₁ s) seg = s :=
+  apd_rec_eq_seg b₀ b₁ s
+
+  -- Lemma 6.3.1 (Interval is contractible)
 
   definition is_contr :
       isContr I :=
-  ⟨ zero , sorry⟩
+  ⟨ zero , λ x, rec_on x (refl zero) seg (eq.rec_on seg (refl (refl zero))) ⟩
 
  end interval
  
