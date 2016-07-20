@@ -13,14 +13,14 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
  variables {A B C D: Type} 
 
-/- §1.4 Dependent function types (Π-Types) -/
+ /- §1.4 Dependent function types (Π-Types) -/
 
  definition swap (A B C: Type) : (A → B → C) → (B → A → C) :=
    λ f b a, f a b
 
  --
 
-/- §1.5 Product types -/
+ /- §1.5 Product types -/
  
  open prod unit
 
@@ -35,12 +35,12 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
 --
 
-/- §1.6 Dependent pair types (Σ-Types) -/
+ /- §1.6 Dependent pair types (Σ-Types) -/
 
  open sigma
  
  definition ac (A B : Type) (R : A → B → Type) :
-   (Π (x : A), Σ (y : B), R x y ) → (Σ (f : A → B), Π (x : A), R x (f x))  :=
+     (Π (x : A), Σ (y : B), R x y ) → (Σ (f : A → B), Π (x : A), R x (f x))  :=
  λ g, ⟨ λ x, pr1 (g x), λ x, pr2 (g x)⟩
 
  definition magma : Type := Σ (A : Type), A → A → A
@@ -49,7 +49,7 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
  --
 
-/- §1.7 Coproduct types -/
+ /- §1.7 Coproduct types -/
 
  open sum empty
 
@@ -57,7 +57,7 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
  --
 
-/- §1.8 The type of booleans -/
+ /- §1.8 The type of booleans -/
 
  open bool
 
@@ -69,7 +69,7 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
  --
 
-/- §1.9 The natural numbers  -/
+ /- §1.9 The natural numbers  -/
 
  open nat
 
@@ -88,7 +88,7 @@ Theorems and exercises of the HoTT book (Chapter 1)
      ... = succ (i + (j + k)) : idp
      ... = succ ((i + j) + k) : IH)
 
-/- §1.11 Proposition-as-types -/
+ /- §1.11 Proposition-as-types -/
 
  definition dmorganpt: 
     (A → 𝟬) × (B → 𝟬) → ( A + B ) → 𝟬 :=
@@ -112,7 +112,37 @@ Theorems and exercises of the HoTT book (Chapter 1)
 
  definition semigroup : Type := Σ (A : Type), A → A → A
 
-/- Exercises -/
+ /- §1.12 Identity types -/
+
+ -- §1.12.1 Path induction
+
+ -- For this section only, we define a 'path induction' version of equality
+
+ inductive eq' {A : Type} : Π (x y : A), Type :=
+ | refl : Π (a : A), (eq' a a) 
+
+ -- §1.12.1 Equivalence of path induction and based path induction 
+
+ -- Path induction to Based path induction
+
+ definition ind_eq_to_bind_eq {A : Type} {a : A} {C : Π (x : A), eq' a x → Type} {x : A} (p : eq' a x) (c : C a (eq'.refl a)) : C x p  :=
+ (@eq'.rec_on A (λ x y p, Π (C : (Π (z : A), eq' x z → Type)), (C x (eq'.refl x)) → C y p)) a x p (λ a' C' c', c') C c
+
+ -- Based path induction to Path induction
+
+ definition bind_eq_to_ind_eq (f : Π (A : Type) (a : A) (C : Π (x : A), eq' a x → Type) (x : A) (p : eq' a x) (c : C a (eq'.refl a)), C x p) 
+ {A : Type} {C : Π (x y : A), eq' x y → Type} {x y : A} (p : eq' x y) (c : Π (a : A), C a a (eq'.refl a)) : C x y p :=
+ f A x (C x) y  p (c x)
+
+ -- §1.12.2 Disequality
+
+ --
+
+ -- No formalizable content.
+
+ --
+
+ /- Exercises -/
 
  -- 1.1 Given functions f : A ! B and g : B ! C, define their composite g ∘ f : A → C. Show that we have h ∘ (g ∘ f) = (h ∘ g) ∘ f.
 
