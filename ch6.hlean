@@ -172,6 +172,31 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
       isContr I :=
   ⟨ zero , λ x, rec_on x (refl zero) seg (eq.rec_on seg (refl (refl zero))) ⟩
 
+ -- Lemma 6.3.2
+
+ definition to_funext (f g : A → B) (p : Π (x : A), f x = g x) :
+     f = g :=
+ let p_tilde :=  λ x i, rec_on i (f x) (g x) (trans_const seg (f x) ⬝ p x) in
+ let q := λ i, rec_on i (λ x, p_tilde x i) (λ x, p_tilde x i) (trans_const seg _) in
+ ap q seg 
+
  end interval
- 
+
+ --
+
+/- §6.4 (Circles and spheres)  -/
+
+ open circle
+
+ -- Lemma 6.4.1
+
+ definition loop_neq_refl :
+     loop ≠ refl base :=
+ begin
+  intro f, 
+  apply universe_not_set,
+    intro A B p q,
+    induction q,
+    exact ((transport _ f (ndrec_ap A p))⁻¹ ⬝ idp)
+ end
  --
