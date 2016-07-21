@@ -5,9 +5,9 @@ Released under the Apache License 2.0 (see "License");
 Theorems and exercises of the HoTT book (Chapter 2)
 -/
 
-import .ch1 types.bool
+ import .ch1 types.bool
 
-open eq prod sum sigma bool
+ open eq prod sum sigma bool lift
 
 /- ************************************** -/
 /-    Ch.2 Homotopy Type Theory           -/
@@ -634,6 +634,16 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      transport (λ (X : Type), X) (ap B p) u = pr1 (idtoeqv (ap B p)) u :=
  by induction p; apply idp
 
+ -- Useful lemmas
+
+ definition lift_eq (A : Type) :
+     A ≃ (lift A) :=
+ ⟨up, (⟨down,up_down⟩,⟨down,down_up⟩)⟩
+
+ definition univalence_of_ua (A B : Type.{i}) :
+     (A = B) = (lift (A ≃ B)) :=
+ ua ((lift_eq (A ≃ B))⁻¹ ∘ (⟨idtoeqv, @univalence A B⟩)⁻¹)⁻¹
+
  end ua
 
  --
@@ -726,8 +736,6 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  /- §2.12 (Coproducts) -/
 
  section coproduct
-
- open lift
 
  universe variables i j  parameters {A' : Type.{i}} {B' : Type.{j}} {a₀ : A'}
 
