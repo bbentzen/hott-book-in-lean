@@ -199,4 +199,87 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
     induction q,
     exact ((transport _ f (ndrec_ap A p))⁻¹ ⬝ idp)
  end
+
+ -- Lemma 6.4.2
+
+ definition neq_refl :
+     Σ (f : Π (x : S¹), x = x), f ≠ (λ x, refl x) :=
+ ⟨ λ x, circle.rec_on x loop (id_trans_iii loop loop ⬝ ((left_inv loop ⬝ᵣ loop) ⬝ (lu loop)⁻¹)),
+  λ f, loop_neq_refl ((happly f) base)⟩ 
+
+ -- Corollary 6.4.3
+
+ -- Due to the lack of cumulative hierarchy of universes, we will need a few lemmas about lifting
+
+ definition lift_eq (A : Type) :
+     A ≃ (lift A) :=
+ ⟨up, (⟨down,up_down⟩,⟨down,down_up⟩)⟩
+
+ definition univalence_of_ua (A B : Type.{i}) :
+     (A = B) = (lift (A ≃ B)) :=
+ ua ((lift_eq (A ≃ B))⁻¹ ∘ (⟨idtoeqv, @univalence A B⟩)⁻¹)⁻¹ 
+
+ definition isSet_to_lift_isSet (A : Type) :
+     (isSet A) → (isSet (lift A)) :=
+ have get_ap : Π (f : isSet A) (a b : A) (p q : up a = up b), ap (up ∘ down) p = ap (up ∘ down) q, from
+   (λ f a b p q, (ap_func_iii down up p)⁻¹ ⬝ 
+   ((ap (ap up) (f (down (up a)) (down (up b))
+    (ap down p) (ap down q))) ⬝ (ap_func_iii down up q) )),
+ λ f x y, lift.rec_on x (λ a, lift.rec_on y 
+   (λ b p q, (ap_func_iv p)⁻¹ ⬝ (transport (λ (a : lift A → lift A), ap a p = ap a q) 
+     (funext up_down) (get_ap f a b p q)) ⬝ (ap_func_iv q)  ))
+
+ definition lift_isSet_to_isSet (A : Type) :
+     (isSet (lift A)) → (isSet A) :=
+ have get_ap : Π (f : isSet (lift A)) (x y : A) (p q : x = y), ap (down ∘ up) p = ap (down ∘ up) q, from
+   (λ f x y p q, (ap_func_iii up down p)⁻¹ ⬝ 
+    ap (ap down) (f (up x) (up y) (ap up p) (ap up q)) ⬝ 
+    (ap_func_iii up down q)),
+ λ f x y p q, (ap_func_iv p)⁻¹ ⬝ transport (λ (a : A → A), ap a p = ap a q) 
+  (funext down_up) (get_ap f x y p q) ⬝ (ap_func_iv q)
+
+ definition neg_set_to_lift (A : Type) :
+     ¬ (isSet A) → ¬ (isSet (lift A)) :=
+ λ g f, g (lift_isSet_to_isSet A f)
+
+ -- We start the proof showing the following:
+
+ definition id_circle_not_prop :
+     ¬ isProp (id S¹ = id S¹) :=
+ transport (λ X, ¬ (isProp X)) (ua (⟨happly, fun_extensionality⟩)⁻¹) 
+ (show ¬ isProp (Π (x : S¹), x = x), from
+  (λ f, (pr2 neq_refl) (f (pr1 neq_refl) (λ x, refl x))))
+
+ -- Lemma used below (The first projection of the dependent pair given by
+ -- the identity of equivalences induced by identity of functions (first projection) equals itself)
+
+ definition pr1_prop_sigma_eq_on_eqv_eq {A B : Type.{i}} (e₁ e₂ : Σ (f : A → B), isequiv f) (p : pr1 e₁ = pr1 e₂) :
+     pr1 (ap_sigma ((prop_sigma_eq biinv_is_prop e₁ e₂ ) p)) = p :=
+ begin
+   induction e₁ with f e, induction e₂, esimp at *,
+   induction (ua ⟨f,e⟩), induction p,
+   exact (ap pr1 (sigma_comp _))
+ end
+
+ definition eqv_circle_not_Set :
+     ¬ isSet (S¹ ≃ S¹) :=
+ λ f, (λ g, id_circle_not_prop 
+  (show isProp (id S¹ = id S¹), from
+    (λ p q,
+      let H := (g ((prop_sigma_eq biinv_is_prop (idtoeqv (refl S¹)) (idtoeqv (refl S¹))) p)
+               ((prop_sigma_eq biinv_is_prop (idtoeqv (refl S¹)) (idtoeqv (refl S¹))) q)) in
+      let α := pr1_prop_sigma_eq_on_eqv_eq (idtoeqv (refl S¹)) (idtoeqv (refl S¹)) in
+   calc
+     p = pr1 (ap_sigma (prop_sigma_eq biinv_is_prop _ _ p)) : α p
+     ... = pr1 (ap_sigma (prop_sigma_eq biinv_is_prop _ _ q)) : pr1 (transport (λ x, x) (ua (path_sigma _ _)) H)
+     ... = q : α q )
+   ) )
+ (f (idtoeqv (refl S¹)) (idtoeqv (refl S¹)))
+
+ -- The universe is not an 1 type
+
+ definition universe_not_1_type :
+    ¬ is_1_Type (Type₀) :=
+ λ f, (transport (λ X, ¬ (isSet X)) (univalence_of_ua S¹ S¹)⁻¹ (neg_set_to_lift _ eqv_circle_not_Set)) (f S¹ S¹)
+ 
  --
