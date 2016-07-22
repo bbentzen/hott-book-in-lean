@@ -634,16 +634,6 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
      transport (λ (X : Type), X) (ap B p) u = pr1 (idtoeqv (ap B p)) u :=
  by induction p; apply idp
 
- -- Useful lemmas
-
- definition lift_eq (A : Type) :
-     A ≃ (lift A) :=
- ⟨up, (⟨down,up_down⟩,⟨down,down_up⟩)⟩
-
- definition univalence_of_ua (A B : Type.{i}) :
-     (A = B) = (lift (A ≃ B)) :=
- ua ((lift_eq (A ≃ B))⁻¹ ∘ (⟨idtoeqv, @univalence A B⟩)⁻¹)⁻¹
-
  end ua
 
  --
