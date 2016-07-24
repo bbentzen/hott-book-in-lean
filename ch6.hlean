@@ -282,4 +282,58 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
     ¬ is_1_Type (Type₀) :=
  λ f, (transport (λ X, ¬ (isSet X)) (univalence_of_ua S¹ S¹)⁻¹ (neg_set_to_lift _ eqv_circle_not_Set)) (f S¹ S¹)
  
+ -- We define the 2-sphere using suspensions, defined in the next section,
+ -- For now we define ap2 and transport2
+
+ -- Lemma 6.4.4
+
+ definition ap2 (f : A → B) {x y : A} {p q : x = y} (r : p = q) :
+     ap f p = ap f q :=
+ eq.rec idp r
+
+ definition transport2 (P : A → Type) {x y : A} {p q : x = y} (r : p = q) :
+     transport P p = transport P q :=
+ eq.rec idp r
+
+--
+
+ /- §6.5 (Suspensions)  -/
+
+ namespace suspension
+
+  definition susp (A : Type) : Type := quotient (λ (x y : 𝟭+𝟭), A × (x=(@inl 𝟭 𝟭 ⋆) × y=(@inr 𝟭 𝟭 ⋆)) ) --(λ (x y : 𝟮), (x=ff × y=tt) )
+
+  definition n {A : Type} : susp A := class_of (λ (x y : 𝟭+𝟭), A × (x=(inl ⋆) × y=(inr ⋆)) ) (@inl 𝟭 𝟭 ⋆)
+
+  definition s {A : Type} : susp A := class_of (λ (x y : 𝟭+𝟭), A × (x=(inl ⋆) × y=(inr ⋆)) ) (@inr 𝟭 𝟭 ⋆)
+
+  definition merid {A : Type} (a : A) : @n A = @s A := --eq_of_rel (λ (x y : 𝟮), x=ff × y=tt) (refl ff, refl tt)
+   eq_of_rel (λ (x y : 𝟭+𝟭), A × (x=(inl ⋆) × y=(inr ⋆)) ) (a, (refl (inl ⋆),refl (inr ⋆)))
+
+  -- Induction principle for suspensions
+ 
+  definition rec {A : Type} {P : susp A → Type.{i}} (bₙ : P n) (bₛ : P s) (m : Π (a : A), bₙ =⟨merid a⟩ bₛ) (x : susp A) : P x :=
+   @quotient.rec (𝟭+𝟭) (λ (x y : 𝟭+𝟭), A × (x=(inl ⋆) × y=(inr ⋆)) ) P
+    (λ (a : 𝟭+𝟭), sum.rec_on a (λ u, unit.rec_on u bₙ) (λ u, unit.rec_on u bₛ))
+    begin
+      intro a a' H, induction H with H₁ H₂, induction a, induction a' with a',
+       esimp at *, induction a, induction a',
+        exact (empty.rec_on _ (down (pr1 (sum_equiv (inr ⋆)) (pr2 (H₂))))),
+       esimp at *, induction a, induction a_1,
+        begin
+         apply change_path,
+           exact (transport (λ (a : A × inl ⋆ = inl ⋆ × inr ⋆ = inr ⋆), 
+              merid H₁ = eq_of_rel (λ (x y : 𝟭 + 𝟭), A × x = inl ⋆ × y = inr ⋆) a) (show (H₁, (refl (inl ⋆),refl (inr ⋆))) = (H₁,H₂),
+            from 
+              pair_eq (refl H₁, (pair_eq (transport isSet (ua bool_eq_unit_unit) bool_is_set (inl ⋆) (inl ⋆) (refl (inl ⋆)) (pr1 H₂),
+               transport isSet (ua bool_eq_unit_unit) bool_is_set (inr ⋆) (inr ⋆) (refl (inr ⋆)) (pr2 H₂)))  )
+              ) idp),
+         exact (pathover_of_tr_eq (m H₁))
+        end,
+       esimp at *, induction a, induction a', induction a, esimp at *,
+        exact (empty.rec_on _ (down (pr1 (sum_equiv (inr ⋆)) (pr2 (H₂))))),
+      induction a, esimp at *,
+        exact (empty.rec_on _ (down (pr1 (sum_equiv (inr ⋆)) (pr1 (H₂))⁻¹ )))
+    end x
+
  --
