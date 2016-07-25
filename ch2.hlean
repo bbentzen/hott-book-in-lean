@@ -363,8 +363,20 @@ definition hom_ap_id' {x : A} (f : A → A) (H : f ~ id A )  :
  by cases s with p q; cases x with a b; cases y with a' b'; esimp at *; induction p; induction q; esimp at *
 
  definition prod_uniq {x y : A × B} (r : x = y) :
-   pair_eq (ap pr1 r, ap pr2 r) = r :=
+     pair_eq (ap pr1 r, ap pr2 r) = r :=
  by induction r; cases x; apply idp
+
+ -- Alternative versions for prod_beta
+
+ definition prod_beta1 {x y : A × B} (s : (pr1 x = pr1 y) × (pr2 x = pr2 y))  : 
+     ap pr1 (pair_eq s) = pr1 s :=
+ by cases s with p q; cases x with a b; cases y with a' b';
+  esimp at *; induction p; induction q; reflexivity
+
+ definition prod_beta2 {x y : A × B} (s : (pr1 x = pr1 y) × (pr2 x = pr2 y))  : 
+     ap pr2 (pair_eq s) = pr2 s :=
+ by cases s with p q; cases x with a b; cases y with a' b';
+  esimp at *; induction p; induction q; reflexivity
 
  -- Theorem 2.6.2
 
