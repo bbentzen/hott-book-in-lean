@@ -180,6 +180,18 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
  let q := λ i, rec_on i (λ x, p_tilde x i) (λ x, p_tilde x i) (trans_const seg _) in
  ap q seg 
 
+ -- Non-dependent recursor
+
+ definition ndrec (a₀ a₁ : A) (s : a₀ = a₁) (x : I) : A :=
+  @interval.rec_on (λ x, A) x a₀ a₁ (concat (trans_const seg a₀) s)
+
+ definition ndrec_ap (a₀ a₁ : A) (s : a₀ = a₁) (x : I) :
+     ap (ndrec a₀ a₁ s) seg = s :=
+ have H : trans_const seg a₀ ⬝ ap (ndrec a₀ a₁ s) seg = trans_const seg a₀ ⬝ s, from
+   (apd_eq_trans_const_ap (λ x, A) (ndrec a₀ a₁ s) seg)⁻¹ ⬝
+   ((@apd_rec_on_eq_seg (λ x, A) a₀ a₁ (trans_const seg a₀ ⬝ s))), 
+ unwhisker_left (trans_const seg a₀) H 
+
  end interval
 
  --
@@ -368,6 +380,18 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
   definition apd_rec_on_eq_merid {P : susp A → Type} (bₙ : P n) (bₛ : P s) (m : Π (a : A), bₙ =⟨merid a⟩ bₛ) (a : A) :
       apd (λ x, rec_on x bₙ bₛ m) (merid a) = m a :=
   apd_rec_eq_merid bₙ bₛ m a
+
+ -- Non-dependent recursor
+
+ definition ndrec (a₀ a₁ : A) (m : Π (a : A), a₀ = a₁) (x : susp A) : A :=
+  @suspension.rec_on A (λ x, A) x a₀ a₁ (λ a, concat (trans_const (merid a) a₀) (m a))
+
+ definition ndrec_ap (a₀ a₁ : A) (m : Π (a : A), a₀ = a₁) (a : A) :
+     ap (ndrec a₀ a₁ m) (merid a) = m a :=
+ have H : trans_const (merid a) a₀ ⬝ ap (ndrec a₀ a₁ m) (merid a) = trans_const (merid a) a₀ ⬝ m a, from
+   (apd_eq_trans_const_ap (λ x, A) (ndrec a₀ a₁ m) (merid a))⁻¹ ⬝ 
+   ((@apd_rec_on_eq_merid A (λ x, A) a₀ a₁ (λ a, trans_const (merid a) a₀ ⬝ m a)) a), 
+ unwhisker_left (trans_const (merid a) a₀) H 
 
   end suspension
 
