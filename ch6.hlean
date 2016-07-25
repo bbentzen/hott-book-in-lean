@@ -136,7 +136,7 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
     (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
     (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₁⁻¹)))) ) ) x
 
-  definition adpo_rec_eq_seg {P : I → Type.{i}} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
+  definition apdo_rec_eq_seg {P : I → Type.{i}} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
       apdo (λ x, rec b₀ b₁ s x) seg = (pathover_of_tr_eq s) :=
   (@quotient.rec_eq_of_rel 𝟮 (λ (x y : 𝟮), x=ff × y=tt) P (λ (a : 𝟮), bool.rec_on a b₀ b₁)
    (λ a a', (bool.rec_on a  (bool.rec_on a' (λ H, prod.rec_on H (λ H₁ H₂, empty.rec _ (ff_ne_tt H₂)))
@@ -156,7 +156,7 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
 
   definition apd_rec_eq_seg {P : I → Type} (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) :
       apd (λ x, rec b₀ b₁ s x) seg = s :=
-  (apdo_to_apd (λ x, rec b₀ b₁ s x) seg)⁻¹ ⬝ ap tr_eq_of_pathover (adpo_rec_eq_seg b₀ b₁ s) ⬝
+  (apdo_to_apd (λ x, rec b₀ b₁ s x) seg)⁻¹ ⬝ ap tr_eq_of_pathover (apdo_rec_eq_seg b₀ b₁ s) ⬝
   (@cancel_tr_pathover I zero one P seg b₀ b₁ s)
 
   definition rec_on {P : I → Type.{i}} (x : I) (b₀ : P zero) (b₁ : P one) (s : b₀ =⟨seg⟩ b₁) : P x :=
@@ -335,5 +335,40 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
       induction a, esimp at *,
         exact (empty.rec_on _ (down (pr1 (sum_equiv (inr ⋆)) (pr1 (H₂))⁻¹ )))
     end x
+
+  definition apdo_rec_eq_merid {P : susp A → Type} (bₙ : P n) (bₛ : P s) (m : Π (a : A), bₙ =⟨merid a⟩ bₛ) (a : A) :
+     apdo (λ x, rec bₙ bₛ m x) (merid a) = (pathover_of_tr_eq (m a)) :=
+  let idp_eq_pair_etc :=
+     pr1 (typeq_sym (path_pair idp _)) 
+     (set_is_1_type (transport isSet (ua.ua bool_eq_unit_unit) bool_is_set) (@inl 𝟭 𝟭 ⋆) (inl ⋆) (refl (inl ⋆)) (refl (inl ⋆)) idp 
+     (transport isSet (ua bool_eq_unit_unit) bool_is_set (inl star) (inl star) (refl (inl star)) (refl (inl star)))
+      ⬝ (prod_beta1 _)⁻¹ , 
+     set_is_1_type (transport isSet (ua.ua bool_eq_unit_unit) bool_is_set) (@inr 𝟭 𝟭 ⋆) (inr ⋆) (refl (inr ⋆)) (refl (inr ⋆)) idp 
+     (transport isSet (ua bool_eq_unit_unit) bool_is_set (inr ⋆) (inr ⋆) (refl (inr ⋆)) (refl (inr ⋆))) ⬝ (prod_beta2 _)⁻¹) in
+  (@quotient.rec_eq_of_rel (𝟭+𝟭) (λ (x y : 𝟭+𝟭), A × (x=(inl ⋆) × y=(inr ⋆)) ) P
+   (λ (a : 𝟭+𝟭), sum.rec_on a (λ u, unit.rec_on u bₙ) (λ u, unit.rec_on u bₛ))
+    _ (@inl 𝟭 𝟭 ⋆) (@inr 𝟭 𝟭 ⋆) (a,(refl (inl ⋆), refl (inr ⋆))) ) ⬝ -- concat
+  (show _ = pathover_of_tr_eq (m a), from
+   (transport _ (ua (pathover_pathover_path _ _ _) ) 
+     (change_path 
+       (show refl (merid a) = _, from 
+           transport _ (idp_eq_pair_etc) idp
+        )
+       (pathover.idpatho (pathover_of_tr_eq (m a)))) )  
+   )
+
+  definition apd_rec_eq_merid {P : susp A → Type} (bₙ : P n) (bₛ : P s) (m : Π (a : A), bₙ =⟨merid a⟩ bₛ) (a : A) :
+      apd (λ x, rec bₙ bₛ m x) (merid a) = m a :=
+  (apdo_to_apd (λ x, rec bₙ bₛ m x) (merid a))⁻¹ ⬝ ap tr_eq_of_pathover (apdo_rec_eq_merid bₙ bₛ m a) ⬝
+  (@cancel_tr_pathover (susp A) n s P (merid a) bₙ bₛ (m a))
+
+  definition rec_on {A : Type} {P : susp A → Type.{i}} (x : susp A) (bₙ : P n) (bₛ : P s) (m : Π (a : A), bₙ =⟨merid a⟩ bₛ) : P x :=
+  rec bₙ bₛ m x
+
+  definition apd_rec_on_eq_merid {P : susp A → Type} (bₙ : P n) (bₛ : P s) (m : Π (a : A), bₙ =⟨merid a⟩ bₛ) (a : A) :
+      apd (λ x, rec_on x bₙ bₛ m) (merid a) = m a :=
+  apd_rec_eq_merid bₙ bₛ m a
+
+  end suspension
 
  --
