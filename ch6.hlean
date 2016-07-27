@@ -423,7 +423,7 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
         ((((ap path_inv ((ap_func_iii susp_bool_to_circle circle_to_susp_bool (merid ff))⁻¹ ⬝
         (ap (ap circle_to_susp_bool) (suspension.ndrec_ap base base (λ a, bool.rec_on a loop (refl base)) ff)) ⬝ 
         (circle.ndrec_ap n (concat (merid ff) (merid tt)⁻¹))) ⬝
-        (inv_conc (merid ff) (merid tt)⁻¹) ⬝ (inv_canc (merid tt) ⬝ᵣ (merid ff)⁻¹)) ⬝ᵣ (refl n)) ⬝ᵣ 
+        (con_inv (merid ff) (merid tt)⁻¹) ⬝ (inv_canc (merid tt) ⬝ᵣ (merid ff)⁻¹)) ⬝ᵣ (refl n)) ⬝ᵣ 
         (ap (id (susp 𝟮)) (merid ff))) ⬝
         ((ru (concat (merid tt) (merid ff)⁻¹)) ⬝ᵣ (ap (id (susp 𝟮)) (merid ff)))⁻¹ ⬝ 
         (conc_assoc (merid tt) (merid ff)⁻¹ (ap (id (susp 𝟮)) (merid ff)))⁻¹  ⬝ 
