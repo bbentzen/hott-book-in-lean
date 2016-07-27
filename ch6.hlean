@@ -393,6 +393,51 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
    ((@apd_rec_on_eq_merid A (λ x, A) a₀ a₁ (λ a, trans_const (merid a) a₀ ⬝ m a)) a), 
  unwhisker_left (trans_const (merid a) a₀) H 
 
+ -- Lemma 6.5.1
+
+ definition susp_bool_to_circle :
+    susp 𝟮 → S¹ :=
+ λ x, suspension.ndrec base base (λ a : 𝟮, bool.rec_on a loop (refl base)) x
+
+ definition circle_to_susp_bool :
+    S¹ →  susp 𝟮 :=
+ λ x, circle.ndrec n (concat (merid ff) (merid tt)⁻¹) x
+
+ definition susp_bool_to_circle_eq :
+    susp 𝟮 ≃ S¹ :=
+ ⟨susp_bool_to_circle,
+  (⟨circle_to_susp_bool, λ x, circle.rec_on x (refl base)
+    ((id_trans_fun (susp_bool_to_circle ∘ circle_to_susp_bool) (id S¹) loop (refl base)) ⬝ 
+      (conc_assoc _ _ _)⁻¹ ⬝ ((ap (susp_bool_to_circle ∘ circle_to_susp_bool) loop)⁻¹ ⬝ₗ 
+      (refl base ⬝ₗ (ap_func_iv loop)) ⬝ (lu loop)⁻¹) ⬝
+      ((ap path_inv (((ap_func_iii circle_to_susp_bool susp_bool_to_circle loop)⁻¹ ⬝ 
+      (ap (ap susp_bool_to_circle) (circle.ndrec_ap n (merid ff ⬝ (merid tt)⁻¹))) ⬝ 
+      (ap_func_i susp_bool_to_circle (merid ff) (merid tt)⁻¹)) ⬝ 
+      ((ap susp_bool_to_circle (merid ff) ⬝ₗ (ap_func_ii susp_bool_to_circle (merid tt)) ⬝ 
+       (ap path_inv (suspension.ndrec_ap base base (λ a, bool.rec_on a loop (refl base)) tt))) ⬝ 
+         (suspension.ndrec_ap base base (λ a, bool.rec_on a loop (refl base)) ff)))) ⬝ᵣ loop) ⬝ left_inv loop )
+     ⟩,
+    ⟨circle_to_susp_bool, 
+      λ x, suspension.rec_on x (refl n) (merid tt) (λ b, bool.rec_on b 
+       ((id_trans_fun (circle_to_susp_bool ∘ susp_bool_to_circle) (id (susp 𝟮)) (merid ff) (refl n)) ⬝ -- ff
+        ((((ap path_inv ((ap_func_iii susp_bool_to_circle circle_to_susp_bool (merid ff))⁻¹ ⬝
+        (ap (ap circle_to_susp_bool) (suspension.ndrec_ap base base (λ a, bool.rec_on a loop (refl base)) ff)) ⬝ 
+        (circle.ndrec_ap n (concat (merid ff) (merid tt)⁻¹))) ⬝
+        (inv_conc (merid ff) (merid tt)⁻¹) ⬝ (inv_canc (merid tt) ⬝ᵣ (merid ff)⁻¹)) ⬝ᵣ (refl n)) ⬝ᵣ 
+        (ap (id (susp 𝟮)) (merid ff))) ⬝
+        ((ru (concat (merid tt) (merid ff)⁻¹)) ⬝ᵣ (ap (id (susp 𝟮)) (merid ff)))⁻¹ ⬝ 
+        (conc_assoc (merid tt) (merid ff)⁻¹ (ap (id (susp 𝟮)) (merid ff)))⁻¹  ⬝ 
+        ((merid tt) ⬝ₗ ((merid ff)⁻¹ ⬝ₗ (ap_func_iv (merid ff)))) ⬝ 
+         (merid tt ⬝ₗ (left_inv (merid ff)))) )
+       ((id_trans_fun (circle_to_susp_bool ∘ susp_bool_to_circle) (id (susp 𝟮)) (merid tt) (refl n)) ⬝ -- tt
+        ((((((ap path_inv ((ap_func_iii susp_bool_to_circle circle_to_susp_bool (merid tt))⁻¹ ⬝ 
+        (ap (ap circle_to_susp_bool) (suspension.ndrec_ap base base 
+         (λ a, bool.rec_on a loop (refl base)) tt)))) ⬝ᵣ (refl n)) ⬝
+        (lu (refl n))⁻¹) ⬝ᵣ (ap (id (susp 𝟮)) (merid tt)))) ⬝ 
+        (lu (ap (id (susp 𝟮)) (merid tt)))⁻¹ ⬝ 
+         ap_func_iv (merid tt)) )
+    ) ⟩)⟩
+
   end suspension
 
  --
