@@ -438,6 +438,47 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
          ap_func_iv (merid tt)) )
     ) ⟩)⟩
 
+ -- n-Spheres definition
+
+ definition n_sphere : ℕ → Type₀
+ | n_sphere zero := 𝟮
+ | n_sphere (succ k) := susp (n_sphere k)
+
+ -- Lemma 6.5.3
+
+ definition Map (A : Type) (a₀ : A) (B : Type) (b₀ : B) : Type :=
+  Σ (f : A → B), f (a₀) = b₀ 
+
+ definition map_to_fun (A : Type) (B : Type) (b₀ : B) :
+     Map (A + 𝟭) (inr ⋆) B b₀ → (A → B) :=
+ λ m a, (pr1 m) (inl a)
+
+ definition fun_to_map (A : Type) (B : Type) (b₀ : B) :
+     (A → B) → (Map (A + 𝟭) (inr ⋆) B b₀)  :=
+ λ f, ⟨λ x, @sum.rec_on A 𝟭 (λ (x : A + 𝟭), B) x f (λ u, b₀), (refl b₀) ⟩
+
+ definition map_eq_fun (A : Type) (B : Type) (b₀ : B) :
+     Map (A + 𝟭) (inr ⋆) B b₀ ≃ (A → B) :=
+ ⟨map_to_fun A B b₀, (⟨fun_to_map A B b₀,(λ f, refl f)⟩ , 
+   ⟨fun_to_map A B b₀ , 
+     λ m, sigma.rec_on m (λ f p,
+      sigma_eq ⟨funext (λ x, @sum.rec_on A 𝟭 (λ (x : A + 𝟭), 
+      @sum.rec_on A 𝟭 (λ (x : A + 𝟭), B) x (λ a, f (inl a)) (λ u, b₀) = f x)
+      x (λ a, refl (f (inl a)) ) (λ u, unit.rec_on u p⁻¹)), 
+         eq.rec_on p
+         (show (transport (λ (f' : A + 𝟭 → B), f' (inr ⋆) = f (inr ⋆))
+          (funext (λ (x : A + 𝟭), @sum.rec_on A 𝟭 (λ (x : A + 𝟭), 
+          @sum.rec_on A 𝟭 (λ (x : A + 𝟭), B) x (λ a, f (inl a)) (λ u, f (inr ⋆)) = f x) 
+          x (λ (a : A), refl (f (inl a))) (λ (u : 𝟭), unit.rec_on u (refl (f (inr star)))⁻¹ )))
+          (refl (f (inr ⋆)))) = refl (f (inr ⋆)), from
+             transport _ (show (λ (x : A + 𝟭), @sum.rec_on A 𝟭 (λ (x : A + 𝟭), B) x (λ a, f (inl a)) (λ u, f (inr ⋆)) ) = f, from
+                begin apply funext, intro x, cases x, esimp at *, esimp at *, induction a, reflexivity end)
+              (transport _ ((funext_uniq (refl _))⁻¹ ⬝ 
+                (ap funext (begin apply funext, intro x, cases x, esimp at *, induction a, esimp at * end))) idp)
+          ) 
+       ⟩)
+ ⟩ ) ⟩
+
   end suspension
 
  --
