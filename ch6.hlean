@@ -383,15 +383,15 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
 
  -- Non-dependent recursor
 
- definition ndrec (a₀ a₁ : A) (m : Π (a : A), a₀ = a₁) (x : susp A) : A :=
-  @suspension.rec_on A (λ x, A) x a₀ a₁ (λ a, concat (trans_const (merid a) a₀) (m a))
+ definition ndrec (b₀ b₁ : B) (m : Π (a : A), b₀ = b₁) (x : susp A) : B :=
+  @suspension.rec_on A (λ x, B) x b₀ b₁ (λ a, concat (trans_const (merid a) b₀) (m a))
 
- definition ndrec_ap (a₀ a₁ : A) (m : Π (a : A), a₀ = a₁) (a : A) :
-     ap (ndrec a₀ a₁ m) (merid a) = m a :=
- have H : trans_const (merid a) a₀ ⬝ ap (ndrec a₀ a₁ m) (merid a) = trans_const (merid a) a₀ ⬝ m a, from
-   (apd_eq_trans_const_ap (λ x, A) (ndrec a₀ a₁ m) (merid a))⁻¹ ⬝ 
-   ((@apd_rec_on_eq_merid A (λ x, A) a₀ a₁ (λ a, trans_const (merid a) a₀ ⬝ m a)) a), 
- unwhisker_left (trans_const (merid a) a₀) H 
+ definition ndrec_ap (b₀ b₁ : B) (m : Π (a : A), b₀ = b₁) (a : A) :
+     ap (ndrec b₀ b₁ m) (merid a) = m a :=
+ have H : trans_const (merid a) b₀ ⬝ ap (ndrec b₀ b₁ m) (merid a) = trans_const (merid a) b₀ ⬝ m a, from
+   (apd_eq_trans_const_ap (λ x, B) (ndrec b₀ b₁ m) (merid a))⁻¹ ⬝ 
+   ((@apd_rec_on_eq_merid A (λ x, B) b₀ b₁ (λ a, trans_const (merid a) b₀ ⬝ m a)) a), 
+ unwhisker_left (trans_const (merid a) b₀) H 
 
  -- Lemma 6.5.1
 
@@ -480,5 +480,52 @@ open eq prod unit bool sum sigma ua funext nat lift quotient
  ⟩ ) ⟩
 
   end suspension
+
+---------
+
+ namespace two_sphere
+
+  definition S2 : Type₀ := quotient (λ (x y : 𝟭), S¹)
+
+  definition base : S2 := class_of (λ (x y : 𝟭), S¹) ⋆
+
+  definition reflb : base = base := eq_of_rel (λ (x y : 𝟭), S¹) circle.base
+
+  definition surf_fun : S¹ → base = base := λ (x : S¹), eq_of_rel (λ (x y : 𝟭), S¹) x --(circle.ndrec circle.base loop x)
+
+  definition surf : reflb = reflb := ap surf_fun loop
+
+  -- Notation for S²
+
+  notation `S²` := S2
+
+  -- Lemma 6.4.4
+
+  definition ap2 {x y : A} (f : A → B) {p q : x = y} (r : p = q) :
+      ap f p = ap f q :=
+  eq.rec idp r
+
+  definition transport2 (P : A → Type) {x y : A} {p q : x = y} (r : p = q) :
+      transport P p = transport P q :=
+  eq.rec idp r
+
+  definition apd2 {x y : A} {P : A → Type} (f : Π (x : A), P(x)) {p q : x = y} (r : p = q) :
+      transport (λ (p : x = y), f x =⟨p⟩ f y) r (apd f p) = apd f q :=
+  eq.rec (eq.rec idp p) r
+
+  -- Induction principle for S²
+
+  definition change_fam {x y : A} {P : A → Type.{i}} {Q : A → Type.{i}} (p : x = y) (u : P x) (v : P y) (f : Π (x : A), P x → Q x) 
+  (α : P = Q) (H : transport P p u = v) : transport Q p (f x u) = (f y v) :=
+  by induction p; induction α; esimp at *; apply (ap (f x) H)
+
+  definition rec {P : S² → Type.{i}} (b : P base) (l : b =⟨reflb⟩ b) (s : l =⟨surf⟩ l) (x : S²) : P x :=
+  @quotient.rec 𝟭 (λ (x y : 𝟭), S¹) P (λ (a : 𝟭), unit.rec_on a b)
+ (λ a a' H, unit.rec_on a (unit.rec_on a' (circle.rec_on H
+  (show pathover P b (eq_of_rel (λ (x y : 𝟭), S¹) circle.base) b, from (pathover_of_tr_eq l))
+  (change_fam loop l l (λ x, pathover_of_tr_eq) 
+   (funext (λ (a : S¹), (ua (@pathover_equiv_tr_eq S² P base base (eq_of_rel (λ (x y : 𝟭), S¹) a) b b))⁻¹))
+   (transport (λ α, α = l) (trans_ap_fun surf_fun (λ (p : base = base), (transport P p b) = b) loop l)⁻¹ s) ) ) 
+      )) x
 
  --
