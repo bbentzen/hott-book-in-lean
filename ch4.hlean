@@ -27,18 +27,36 @@ open eq prod unit bool sum sigma ua funext nat lift
      A × A' ≃  B × B' :=
  by induction (ua e₁); induction (ua e₂); apply typeq_refl _
 
- definition sigma_preserves_equiv {X : Type} {A B : X → Type} (H : Π (x : X), A x ≃ B x ) :
+ definition sigma_preserves_equiv {X : Type} {A B : X → Type} (e : Π (x : X), A x ≃ B x ) :
      (Σ (x : X), A x)  ≃  Σ (x : X), B x :=
- let sigeq := λ w, ⟨(pr1 w), (pr1 (H (pr1 w))) (pr2 w) ⟩ in
+ let sigeq := λ w, ⟨(pr1 w), (pr1 (e (pr1 w))) (pr2 w) ⟩ in
  let siginv := λ w', ⟨(pr1 w'),
-    pr1 (isequiv_to_qinv (pr1 (H (pr1 w'))) (pr2 (H (pr1 w')))) (pr2 w') ⟩ in
+    pr1 (isequiv_to_qinv (pr1 (e (pr1 w'))) (pr2 (e (pr1 w')))) (pr2 w') ⟩ in
  have comp : sigeq ∘ siginv ~ id _, from
   λ w', sigma.rec_on w' (λ w1' w2', sigma_eq ⟨ refl w1',
-  (pr1 (pr2 (isequiv_to_qinv (pr1 (H w1')) (pr2 (H w1'))))) w2' ⟩),
+  (pr1 (pr2 (isequiv_to_qinv (pr1 (e w1')) (pr2 (e w1'))))) w2' ⟩),
  have uniq : siginv ∘ sigeq ~ id _, from
   λ w, sigma.rec_on w (λ w1 w2, sigma_eq ⟨refl w1,
-  (pr2 (pr2 (isequiv_to_qinv (pr1 (H w1)) (pr2 (H w1))))) w2 ⟩),
+  (pr2 (pr2 (isequiv_to_qinv (pr1 (e w1)) (pr2 (e w1))))) w2 ⟩),
  ⟨sigeq, (⟨siginv, comp⟩, ⟨siginv, uniq⟩)⟩
+
+ definition pi_preserves_equiv {X : Type} {A B : X → Type} (e : Π (x : X), A x ≃ B x) :
+     (Π (x : X), A x) ≃ (Π (x : X), B x) :=
+ ⟨(λ f x, (pr1 (e x)) (f x)) , 
+  (⟨(λ g x, (pr1 (pr1 (pr2 (e x)))) (g x)), 
+  begin
+   intro f, apply funext, intro x, 
+   exact (show pr1 (e x) ((pr1 (pr1 (pr2 (e x)))) (f x)) = f x,
+    from (pr2 (pr1 (pr2 (e x)))) (f x) ) 
+  end 
+  ⟩,
+ ⟨(λ g x, (pr1 (pr2 (pr2 (e x)))) (g x)),
+  begin
+    intro f, apply funext, intro x, 
+    exact (show ((pr1 (pr2 (pr2 (e x)))) ((pr1 (e x)) (f x)) ) = f x,
+     from (pr2 (pr2 (pr2 (e x)))) (f x) )
+  end
+ ⟩)⟩
 
  -- The "funext" version of quasi-inverse
 
