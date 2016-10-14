@@ -451,3 +451,16 @@ open eq prod unit bool sum sigma ua funext nat lift
   ⟩ ) )
 
  --
+
+ -- Useful Thm
+ 
+  definition contr_implies_loop_contr :
+     isContr(A) → isContr(A = A) :=
+ λ H, ⟨ refl A,
+  λ p, ua_refl ⬝ ap ua
+    (show typeq_refl A = idtoeqv p, from
+      sigma_eq ⟨funext (λ x, ((pr2 H) x)⁻¹ ⬝ (pr2 H) (pr1 (idtoeqv p) x) ) ,
+      (biinv_is_prop (pr1 (idtoeqv p))) _ (pr2 (idtoeqv p)) ⟩)
+ ⬝ (ua_uniq p) ⟩ 
+
+ --
