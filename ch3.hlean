@@ -225,11 +225,11 @@ definition universe_not_set :
 
  namespace decidable
 
- definition decidable (A : Type) : Type := A + ¬ A
+ definition isDec (A : Type) : Type := A + ¬ A
     
- definition decidable_family (B : A → Type) : Type := Π (a : A), B (a) + ¬ B (a)
+ definition hasDecFam (B : A → Type) : Type := Π (a : A), B (a) + ¬ B (a)
 
- definition decidable_eq (A : Type) : Type := Π (a b : A), (a = b) + ¬ (a = b)
+ definition hasDecEq (A : Type) : Type := Π (a b : A), (a = b) + ¬ (a = b)
 
  end decidable
 
