@@ -61,7 +61,7 @@ open eq prod unit bool sum sigma ua funext nat lift decidable
      (x = y) → (x = y) :=
  λ p, sum.rec_on (H x y) (λ Heq, Heq) (λ Hne, empty.rec_on _ (Hne p))
 
- -- such as `collapse p = colapse q` holds for any p q : x = y
+ -- such that `collapse p = colapse q` holds for any p q : x = y
 
  definition collapses_eq {x y : A} (H : decidable_eq A) (p q : x = y) :
      collapse H p = collapse H q :=
