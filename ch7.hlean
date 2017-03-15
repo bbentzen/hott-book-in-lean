@@ -53,15 +53,15 @@ open eq prod unit bool sum sigma ua funext nat lift decidable
 
  -- Theorem 7.2.5 (Hedberg Theorem)  
  
- -- This proof is  based on Alan Schmitt's coq proof (https://sympa.inria.fr/sympa/arc/coq-club/2016-09/msg00064.html)
+ -- This proof is based on Alan Schmitt's coq proof (https://sympa.inria.fr/sympa/arc/coq-club/2016-09/msg00064.html)
 
- -- If a type has decidable equality, one can define a "collapsing" function (x = y) → (x = y) 
+ -- If a type has decidable equality, one can define a "collapsing" function (x = y) → (x = y) ...
 
  definition collapse {x y : A} (H : decidable_eq A) :
      (x = y) → (x = y) :=
  λ p, sum.rec_on (H x y) (λ Heq, Heq) (λ Hne, empty.rec_on _ (Hne p))
 
- -- such that `collapse p = colapse q` holds for any p q : x = y
+ -- ...such that `collapse p = colapse q` holds for any p q : x = y
 
  definition collapses_eq {x y : A} (H : decidable_eq A) (p q : x = y) :
      collapse H p = collapse H q :=
@@ -72,7 +72,7 @@ open eq prod unit bool sum sigma ua funext nat lift decidable
    induction (Hne p)
  end
 
- -- and any p : x = y can be rewritten in terms of collapse
+ -- Moreover, any p : x = y can be rewritten in terms of collapse
 
  definition rewrite_collapse {x y : A} (H : decidable_eq A) (p : x = y) :
    (collapse H (refl x))⁻¹ ⬝ (collapse H p) = p :=
