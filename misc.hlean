@@ -1,9 +1,15 @@
 /-
 Copyright (c) 2017 Bruno Bentzen. All rights reserved.
 Released under the Apache License 2.0 (see "License");
-
-Miscellaneous results
 -/
+
+import .ch2 .ch3 .ch4 
+
+open eq prod unit bool sum sigma ua funext nat lift
+
+/- ************************************** -/
+/-    Miscellaneous results               -/
+/- ************************************** -/
 
 -- Contractability:
 
