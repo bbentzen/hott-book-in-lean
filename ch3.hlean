@@ -480,6 +480,15 @@ definition universe_not_set :
 
  -- Exercise 3.20 (in `contr_eq_ii` above)
  
- -- Exercise 3.20 (see `contr_eq_ii` above)
+ -- Contractibility and function extensionality
+ 
+ definition prop_funext (f g : A → B) (H : isContr (Π (x : A), f x = g x)) :
+     isContr (f = g) :=
+ ⟨ funext (pr1 H) ,
+    begin
+      intro p, induction H with H₁ H₂, induction p,
+      exact ap funext (H₂ (happly (refl f))) ⬝ funext_uniq _
+    end
+ ⟩ 
  
  --
